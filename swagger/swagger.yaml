@@ -1,0 +1,47 @@
+---
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Rate the Interview
+  description: |
+    Rate the Interview
+schemes:
+  - http
+host: ratetheinterview.com
+basePath: /
+paths:
+  /submit:
+    get:
+      responses:
+        404:
+          description: get response
+    post:
+      responses:
+        200:
+          description: post response
+      parameters:
+        - name: company
+          in: formData
+          description: company
+          type: string
+          required: true
+        - name: position
+          in: formData
+          description: position
+          type: string
+          required: true
+        - name: location
+          in: formData
+          description: location
+          type: string
+          required: true
+        - name: emoji
+          in: formData
+          description: emoji
+          type: string
+          required: true
+        - name: review
+          in: formData
+          description: review
+          type: string
+          required: true
