@@ -1,26 +1,26 @@
 [
     {
-        "rating": 2, 
-        "comp_disp": "Google", 
-        "created": 1478426592, 
-        "pos_disp": "Senior Software Engineer", 
-        "review": "Great interview!", 
-        "comp_pos": "google#senior software engineer"
+        "id": "d1e24923-5434-4460-ad27-22222222222d",
+        "emoji": "e1f600", 
+        "company": "Google", 
+        "create_time": 1478426592, 
+        "position": "Senior Software Engineer", 
+        "review": "Great interview!" 
     }, 
     {
-        "rating": 0, 
-        "comp_disp": "Google", 
-        "created": 1478426100, 
-        "pos_disp": "Senior Software Engineer", 
-        "review": "Not great", 
-        "comp_pos": "google#senior software engineer"
+        "id": "d1e24923-5434-4460-ad27-11111111111d",
+        "emoji": "e1f620", 
+        "company": "Google", 
+        "create_time": 1478426100, 
+        "position": "Senior Software Engineer", 
+        "review": "Not great"
     }, 
     {
-        "rating": 1, 
-        "comp_disp": "Google", 
-        "created": 1478420000, 
-        "pos_disp": "Senior Software Engineer", 
-        "review": "herp derp derp", 
-        "comp_pos": "google#senior software engineer"
+        "id": "d1e24923-5434-4460-ad27-00000000000d",
+        "emoji": "e1f627", 
+        "company": "Google", 
+        "create_time": 1478420000, 
+        "position": "Senior Software Engineer", 
+        "review": "herp derp derp"
     }
 ]

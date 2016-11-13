@@ -10,7 +10,7 @@
 
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/rate-the-interview.css">
-
+        <link rel="stylesheet" href="css/awesomplete.css" /> 
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
@@ -24,20 +24,33 @@
 
         <div class="submission-box">
           <div class="submission">
-            <form action="#">
-              <input type="text" placeholder="company name, example: google" name="comp" />
-              <input type="text" placeholder="position, example: software engineer" name="pos" />
-              <input type="text" placeholder="review (optional) limit: 140 characters" name="rev" />
-              <div class="rating-selector">
-                <input id="r0" type="radio" name="rating" value="r0">
-                <label for="r0" class="rating r0"></label>
-                <input id="r1" type="radio" name="rating" value="r1" checked>
-                <label for="r1" class="rating r1"></label>
-                <input id="r2" type="radio" name="rating" value="r2">
-                <label for="r2" class="rating r2"></label>
+            <form id="review-submit" action="https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/submit">
+              <ul>
+                <li><input type="text" class="awesomplete" id="input-company" placeholder="Company Name - ex: Google" name="company" /></li>
+                <li><input type="text" class="awesomplete" id="input-position" placeholder="Position - ex: Software Engineer" name="position" /></li>
+                <li><input type="text" class="awesomplete" id="input-location" placeholder="Location - ex: Boston, Massachusetts" name="location" /></li>
+                <li><textarea id="input-review" placeholder="review limit: 140 characters" name="review"></textarea></li>
+              </ul>
+              <div class="emoji-selector">
+                <input id="e1f620" type="radio" name="emoji" value="e1f620">
+                <label for="e1f620" class="rating e1f620"></label>
+                <input id="e1f600" type="radio" name="emoji" value="e1f600" checked>
+                <label for="e1f600" class="rating e1f600"></label>
+                <input id="e1f627" type="radio" name="emoji" value="e1f627">
+                <label for="e1f627" class="rating e1f627"></label>
               </div>
               <button class="myButton">Submit Review</button>
             </form>
+          </div>
+        </div>
+
+        <div class="pending-submissions">
+          <div class="divider-box">
+            <div class="line-behind-text"><h6>Pending Submissions</h6></div>
+          </div>
+
+          <div id="pending-comments" class="comment-box">
+
           </div>
         </div>
 
@@ -50,9 +63,10 @@
         </div>
       </div>
 
-      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-      <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+      <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
+      <!-- <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script> -->
 			<script src="js/plugins.js"></script>
+      <script src="js/awesomplete.js"></script>
       <script src="js/rate-the-interview.js"></script>
 
 
