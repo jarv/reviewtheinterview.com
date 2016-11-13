@@ -42,11 +42,20 @@ body {
 
 }
 
-.e2620 {background-image:url(../img/other/2620.png);}
-.e2705 {background-image:url(../img/other/2705.png);}
-.e2611 {background-image:url(../img/other/2611.png);}
-.e1f4a9 {background-image:url(../img/other/1f4a9.png);}
-.e1f49f {background-image:url(../img/other/1f49f.png);}
+.spinner {background-image:url(../img/spinner.gif);}
+
+    // 2620 skull
+    // 1f4a9 poo
+    // 1f49f heart
+    // 2611 check
+    // 2705 check2
+    // 274c cancel
+
+.cancel {background-image:url(../img/other/274c.png);}
+.reject {background-image:url(../img/other/2620.png);}
+.approve {background-image:url(../img/other/2705.png);}
+.poo {background-image:url(../img/other/1f4a9.png);}
+.love {background-image:url(../img/other/1f49f.png);}
 
 .e1f620 {background-image:url(../img/1f620.png);}
 .e1f600 {background-image:url(../img/1f600.png);}
@@ -268,53 +277,9 @@ body {
   }
 }
 
-
-
-.round-button {
-  width: 60px;
-  position: relative;
-  float: right;
-}
-li.round-button {
-}
-.round-button-circle {
-	width: 100%;
-	height: 0;
-        padding-bottom: 100%;
-
-    border-radius: 50%;
-    overflow:hidden;
-    box-shadow: 0 0 1px gray;
-    transition: all .1s ease-in-out;
-    -webkit-backface-visibility: hidden;
-//    border:1px solid #cfdcec;
-}
-.round-button-circle:hover {
-        cursor:pointer;
-        // background:#30588e;
-        transform: scale(1.1);
-}
-
-
-
 .emoji-comment-selector {
   position: relative;
   float: right;
-
-//  input[type="radio"] {
-//    margin:0;padding:0;
-//    -webkit-appearance:none;
-//       -moz-appearance:none;
-//            appearance:none;
-//    display: none;
-//  }
-//  input:active +.rating{opacity: .9;}
-//  input:checked +.rating {
-//      -webkit-filter: none;
-//         -moz-filter: none;
-//              filter: none;
-//  }
-//
 
   .rating {
       cursor:pointer;
@@ -322,27 +287,13 @@ li.round-button {
       background-repeat:no-repeat;
       display:inline-block;
       width:60px;height:60px;
-    -webkit-backface-visibility: hidden;
-    border-radius: 50%;
-    overflow:hidden;
-    box-shadow: 0 0 2px gray;
-    transition: all .1s ease-in-out;
-//      -webkit-transition: all 100ms ease-in;
-//         -moz-transition: all 100ms ease-in;
-//              transition: all 100ms ease-in;
-//      -webkit-filter: brightness(1.8) grayscale(1) opacity(.6);
-//         -moz-filter: brightness(1.8) grayscale(1) opacity(.6);
-//              filter: brightness(1.8) grayscale(1) opacity(.6);
-
+      -webkit-backface-visibility: hidden;
+      border-radius: 50%;
+      overflow:hidden;
+      box-shadow: 0 0 2px gray;
+      transition: all .1s ease-in-out;
   }
   .rating:hover{
     transform: scale(1.1);
-
-//      -webkit-filter: brightness(1.8) opacity(.4);
-//         -moz-filter: brightness(1.8) opacity(.4);
-//              filter: brightness(1.8) opacity(.4);
-
   }
 }
-
-

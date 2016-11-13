@@ -93,11 +93,12 @@ def get_entry_from_id(key_id):
 
 def increment_action(key_id, action):
     dynamo_submissions = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
+    t = int(time.time() * 100)
     try:
         q = dynamo_submissions.update_item(
             Key={'id': key_id},
-            UpdateExpression="add {} :val".format(action),
-            ExpressionAttributeValues={':val': decimal.Decimal(1)},
+            UpdateExpression="ADD {} :val SET update_time = :ut".format(action),
+            ExpressionAttributeValues={':ut': t, ':val': decimal.Decimal(1)},
             ReturnValues="UPDATED_NEW")
     except Exception, e:
         LOG.exception("Error updating the database for key {} action {} : {}".format(

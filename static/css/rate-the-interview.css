@@ -218,19 +218,22 @@ body {
   .divider-box:last-child {
     margin-right: 0; }
 
-.e2620 {
+.spinner {
+  background-image: url(../img/spinner.gif); }
+
+.cancel {
+  background-image: url(../img/other/274c.png); }
+
+.reject {
   background-image: url(../img/other/2620.png); }
 
-.e2705 {
+.approve {
   background-image: url(../img/other/2705.png); }
 
-.e2611 {
-  background-image: url(../img/other/2611.png); }
-
-.e1f4a9 {
+.poo {
   background-image: url(../img/other/1f4a9.png); }
 
-.e1f49f {
+.love {
   background-image: url(../img/other/1f49f.png); }
 
 .e1f620 {
@@ -413,25 +416,6 @@ body {
       color: rgba(51, 51, 51, 0.5);
       font-size: 0.9em;
       font-style: italic; }
-
-.round-button {
-  width: 60px;
-  position: relative;
-  float: right; }
-
-.round-button-circle {
-  width: 100%;
-  height: 0;
-  padding-bottom: 100%;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 0 1px gray;
-  transition: all .1s ease-in-out;
-  -webkit-backface-visibility: hidden; }
-
-.round-button-circle:hover {
-  cursor: pointer;
-  transform: scale(1.1); }
 
 .emoji-comment-selector {
   position: relative;

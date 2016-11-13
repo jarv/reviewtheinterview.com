@@ -33,7 +33,7 @@ SUBMIT_FIELDS = set([submit.company,
                      submit.review,
                      ])
 
-REGEX_MATCH = "^[A-Za-z\s0-9!:$@#%^&*()]+$"
+REGEX_MATCH = "^[A-Za-z\s0-9!:$@#%^&*(),]+$"
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)

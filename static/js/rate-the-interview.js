@@ -5,6 +5,10 @@
 /*global localStorage: false*/
 (function() {
 
+  var UPDATE_URL = "https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/update";
+  var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
+  var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
+
 	var pad = function(num, size) {
 			var s = "0000" + num;
 			return s.substr(s.length-size);
@@ -24,7 +28,7 @@
 	};
 
 	var time_convert = function(t) {     
-		var a = new Date(t * 1000),
+		var a = new Date(t * 10),
 				today = new Date(),
 				yesterday = new Date(Date.now() - 86400000),
 				months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -43,6 +47,32 @@
 			return date + ' ' + month + ', ' + pad(hour, 2) + ':' + pad(min, 2);
     }
     return date + ' ' + month + ' ' + year + ', ' + pad(hour, 2) + ':' + pad(min, 2);
+	};
+
+  var add_event_listener = function(event, obj, fn) {
+    if (obj.addEventListener) {
+      obj.addEventListener(event, fn, false);
+    } else {
+      obj.attachEvent("on"+event, fn); // old ie
+    }
+  };
+
+	var remove_from_array = function(arr) {
+			var what, a = arguments, L = a.length, ax;
+			while (L > 1 && arr.length) {
+					what = a[--L];
+					ax = arr.indexOf(what);
+					while (ax !== -1) {
+					  arr.splice(ax, 1);
+					  ax = arr.indexOf(what);
+					}
+			}
+			return arr;
+	};
+
+	var remove_elem_by_id = function(id) {
+			var elem = document.getElementById(id);
+			return elem.parentNode.removeChild(elem);
 	};
 
   var major_company_list = [
@@ -211,11 +241,85 @@
   var show_error = function(msg) {
     console.log("ERROR " + msg);
   };
+
   /*
   var show_inprogress = function(msg) {
 
   };
   */
+
+  var get_array_from_storage = function(storage_name) {
+    var ids;
+    try {
+      ids = JSON.parse(localStorage.getItem(storage_name));
+    } catch(e) {
+      ids = [];
+    }
+    if (ids === null) {
+     ids = [];
+    }
+    return ids;
+  };
+
+  var remove_id_from_storage = function(id, storage_name, callback) {
+    var local_ids, json_ids;
+    local_ids = get_array_from_storage(storage_name);
+    json_ids = JSON.stringify(remove_from_array(local_ids, id));
+		localStorage.setItem(storage_name, json_ids);
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+  };
+
+  var add_id_to_storage = function(id, storage_name, callback) {
+    var local_ids, json_ids;
+    local_ids = get_array_from_storage(storage_name);
+    
+    json_ids = JSON.stringify(array_unique(local_ids.concat([id])));
+		localStorage.setItem(storage_name, json_ids);
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+  };
+
+  var post_update = function(el, id, action) {
+    var resp,
+        xhr = new XMLHttpRequest(),
+        data = {};
+
+    data = {
+      "id": id,
+      "action": action === 'cancel' ? 'reject' : action
+    };
+
+    xhr = new XMLHttpRequest();
+    xhr.open("POST", UPDATE_URL);
+    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+    xhr.onload = function() {
+      if (xhr.status !== 200) {
+        show_error(xhr.responseText);	
+        el.className = "";
+        el.className = "rating " + action;
+      } else {
+        resp = JSON.parse(xhr.responseText);
+        if (action === 'cancel') {
+          remove_id_from_storage(resp.id, MY_ID_STORAGE, null);
+          show_my_ids();
+        } else {
+          add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
+				  remove_elem_by_id(resp.id);
+        }
+        el.className = "";
+        el.className = "rating " + action;
+      }
+    };
+    xhr.send(JSON.stringify(data));
+    el.className = "";
+    el.className = "rating spinner";
+  };
+
 
   var create_comment = function(item) {
     var div_c = document.createElement('div');
@@ -242,12 +346,23 @@
     // 1f49f heart
     // 2611 check
     // 2705 check2
-    if (item.pending === "true") {
-      console.log("not null");
-      console.log(item);
-      b.innerHTML = '<div class="rating e2705"></div> <div class="rating e2620"></div>';
+    // 274c cancel
+    if (item.myid === "true") {
+      var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel");
+      b.appendChild(b1);
+      add_event_listener("click", b1, function() { post_update(b1, item.id, 'cancel');   });
+    } else if (item.pending === "true") {
+      var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve");
+      var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject");
+      b.appendChild(b2); b.appendChild(b3);
+      add_event_listener("click", b2, function() { post_update(b2, item.id, 'approve'); });
+      add_event_listener("click", b3, function() { post_update(b3, item.id, 'reject'); });
     } else {
-      b.innerHTML = '<div class="rating e1f49f"></div> <div class="rating e1f4a9"></div>';
+      var b4 = document.createElement('div'); b4.setAttribute("class", "rating love");
+      var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo");
+      b.appendChild(b4); b.appendChild(b5);
+      add_event_listener("click", b4, function() { post_update(b4, item.id, 'love'); });
+      add_event_listener("click", b5, function() { post_update(b5, item.id, 'poo'); });
     }
 
     div_cc.appendChild(b);
@@ -275,47 +390,22 @@
   };
 
 
-  var get_local_pending_ids = function() {
-    var ids;
-    try {
-      ids = JSON.parse(localStorage.getItem("pending_ids"));
-    } catch(e) {
-      ids = [];
-    }
-    if (ids === null) {
-     ids = [];
-    }
-    return ids;
-  };
-
-  var show_pending = function() {
-    var item, local_pending_ids, div, comment;
-    local_pending_ids = get_local_pending_ids();
+  var show_my_ids = function() {
+    var item, div, comment,
+        local_my_ids;
+    console.log("show my ids");
+    local_my_ids = get_array_from_storage(MY_ID_STORAGE);
     div = document.getElementById('pending-comments');
     div.innerHTML = "";
-    local_pending_ids.reverse().forEach( function(id) {
+    local_my_ids.reverse().forEach( function(id) {
       item = JSON.parse(localStorage.getItem(id));
-      item.pending = "true";
+      item.myid = "true";
       comment = create_comment(item);
       div.appendChild(comment);
       add_emoji_style(item);
     });
   };
 
-  var update_pending = function(json, callback) {
-    var pending, local_pending_ids, json_ids;
-
-		pending = JSON.parse(json);
-    local_pending_ids = get_local_pending_ids();
-    
-    json_ids = JSON.stringify(array_unique(local_pending_ids.concat([pending.id])));
-		localStorage.setItem("pending_ids", json_ids);
-		localStorage.setItem(pending.id, JSON.stringify(pending));
-
-    if (typeof callback === 'function') {
-      callback();
-    }
-  };
 /*
   var check_pending = function(callback) {
     if (typeof callback === 'function') {
@@ -336,7 +426,7 @@
   };
 
 	var ajax_submit = function(form) {
-			var i, input, 
+			var i, input, resp,
 					ii = form.length,
 					xhr = new XMLHttpRequest(),
 		 			data = {};
@@ -360,25 +450,24 @@
 					show_error(xhr.responseText);	
 				} else {
           show_submitted("submitted");
-          update_pending(xhr.responseText, show_pending);
+		      resp = JSON.parse(xhr.responseText);
+		      localStorage.setItem(resp.id, JSON.stringify(resp));
+          add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
 				}
       };
 			xhr.send(JSON.stringify(data));
 	};
 
 	var submit_review = function(e) {
+    var submit_form;
     e.preventDefault();
-    var submit_form = document.getElementById("review-submit");
+    submit_form = document.getElementById("review-submit");
 		ajax_submit(submit_form);
   };
 
   var add_event_listeners = function() {
  		var ele =  document.getElementById("review-submit");
-		if (ele.addEventListener) {
-      ele.addEventListener("submit", submit_review, false); //Modern browsers
-		} else if(ele.attachEvent){
-      ele.attachEvent('onsubmit', submit_review); //Old IE
-		}
+    add_event_listener("submit", ele, submit_review);
   };
 
   var autocompletion = function() {
@@ -391,7 +480,7 @@
 
   add_event_listeners();
   autocompletion();
-  show_pending();
+  show_my_ids();
 
 	var request = new XMLHttpRequest();
 	request.open('GET', '/reviews/reviews.json', true);
