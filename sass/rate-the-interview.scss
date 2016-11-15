@@ -51,16 +51,20 @@ body {
     // 2705 check2
     // 274c cancel
 
+// for the buttons
 .cancel {background-image:url(../img/other/274c.png);}
 .reject {background-image:url(../img/other/2620.png);}
 .approve {background-image:url(../img/other/2705.png);}
 .poo {background-image:url(../img/other/1f4a9.png);}
 .love {background-image:url(../img/other/1f49f.png);}
 
+// for the comments
 .e1f620 {background-image:url(../img/1f620.png);}
 .e1f600 {background-image:url(../img/1f600.png);}
 .e1f627 {background-image:url(../img/1f627.png);}
-
+.e1f634 {background-image:url(../img/1f634.png);}
+.e1f631 {background-image:url(../img/1f631.png);}
+.e1f622 {background-image:url(../img/1f622.png);}
 
 .header-box {
   h1 {
@@ -69,6 +73,7 @@ body {
     text-align: center;
     font-weight: 800;
     color: white;
+    margin: 0;
   }
   align-items: center;
   background-position: center;
@@ -76,8 +81,23 @@ body {
   justify-content: center;
   padding: 3em;
 }
+h2 {
+  font-size: 1.5em;
+  font-style: italic;
+  font-weight: 100;
+  width: 50%;
+  margin: auto;
+  text-align: center;
+  color: lighten($p3, 15%);
+  padding-bottom: 20px;
+
+}
 
 .submission {
+  // too many characters
+  .overflow {
+    background-color: #ffacac;
+  }
   .myButton {
       outline:none;
       background-color:lighten($p0, 10%);
@@ -110,6 +130,8 @@ body {
     box-sizing: border-box; /* css3 rec */
     display: inline-block;
   }
+
+  
   input[type=text] {
     display: inline-block;
     border-radius: 5px;
@@ -122,6 +144,8 @@ body {
 }
 
 .emoji-selector {
+  max-width: 400px;
+  margin: auto;
   input[type="radio"] {
     margin:0;padding:0;
     -webkit-appearance:none;
@@ -152,9 +176,10 @@ body {
               filter: brightness(1.8) grayscale(1) opacity(.6);
   }
   .rating:hover{
-      -webkit-filter: brightness(1.8) opacity(.4);
-         -moz-filter: brightness(1.8) opacity(.4);
-              filter: brightness(1.8) opacity(.4);
+    transform: scale(1.1);
+    -webkit-filter: brightness(1.8) opacity(.4);
+       -moz-filter: brightness(1.8) opacity(.4);
+            filter: brightness(1.8) opacity(.4);
   }
 
 
@@ -297,3 +322,26 @@ body {
     transform: scale(1.1);
   }
 }
+
+$base-spacing: 1.5em !default;
+
+#flash-error {
+  background-color: lighten(#ff0000, 10%);
+  color: white;
+}
+
+#flash-info {
+  background-color: darken($dkblue, 10%);
+  color: white;
+}
+
+.flash {
+  display: none;
+  margin-bottom: $base-spacing / 2;
+  padding: $base-spacing / 2;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+

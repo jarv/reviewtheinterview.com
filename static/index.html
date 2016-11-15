@@ -11,17 +11,27 @@
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/rate-the-interview.css">
         <link rel="stylesheet" href="css/awesomplete.css" /> 
+        <link rel="stylesheet" href="css/animate.min.css">
+
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
 			<!--[if lt IE 8]>
 					<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 			<![endif]-->
+
+      <div id="flash-error" class="flash">
+          <span>This is an error message</span>
+      </div>
+      <div id="flash-info" class="flash">
+          <span>This is an info message</span>
+      </div>
+
 			<div class="wrapper">
         <div class="header-box">
           <h1>Rate the Interview</h1>
         </div> 
-
+          <h2>Rate your latest interview with 140 characters and an emoji.</h2>
         <div class="submission-box">
           <div class="submission">
             <form id="review-submit" action="https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/submit">
@@ -38,8 +48,14 @@
                 <label for="e1f600" class="rating e1f600"></label>
                 <input id="e1f627" type="radio" name="emoji" value="e1f627">
                 <label for="e1f627" class="rating e1f627"></label>
+                <input id="e1f634" type="radio" name="emoji" value="e1f634">
+                <label for="e1f634" class="rating e1f634"></label>
+                <input id="e1f631" type="radio" name="emoji" value="e1f631">
+                <label for="e1f631" class="rating e1f631"></label>
+                <input id="e1f622" type="radio" name="emoji" value="e1f622">
+                <label for="e1f622" class="rating e1f622"></label>
               </div>
-              <button class="myButton">Submit Review</button>
+              <button id="input-button" class="myButton">Submit Review</button>
             </form>
           </div>
         </div>

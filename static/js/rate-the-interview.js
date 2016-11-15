@@ -8,6 +8,14 @@
   var UPDATE_URL = "https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/update";
   var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
   var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
+  var FORM_IDS = ['input-review', 'input-company',
+                  'input-position', 'input-location', 'input-button']
+	var MAX_LENGTHS = {
+    'input-company': 20,
+    'input-position': 30,
+    'input-location': 40,
+    'input-review': 140
+	}
 
 	var pad = function(num, size) {
 			var s = "0000" + num;
@@ -73,6 +81,54 @@
 	var remove_elem_by_id = function(id) {
 			var elem = document.getElementById(id);
 			return elem.parentNode.removeChild(elem);
+	};
+
+	var fade_in = function(el, callback) {
+		el.style.opacity = 0;
+
+		var last = +new Date();
+		var tick = function() {
+			el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
+			last = +new Date();
+
+			if (+el.style.opacity < 1) {
+				(window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+			} else {
+        setTimeout(callback, 5000);
+      }
+		};
+
+		tick();
+	};
+
+  var add_class = function(el, class_name) {
+		if (el.classList)
+			el.classList.add(class_name);
+		else
+			el.class_name += ' ' + class_name;
+  }
+
+	var remove_class = function(el, class_name) {
+		if (el.classList)
+			el.classList.remove(class_name);
+		else
+			el.class_name = el.class_name.replace(new RegExp('(^|\\b)' + class_name.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+	};
+
+	var toggle_class = function(el, className) {
+		if (el.classList) {
+			el.classList.toggle(className);
+		} else {
+			var classes = el.className.split(' ');
+			var existingIndex = classes.indexOf(className);
+
+			if (existingIndex >= 0)
+				classes.splice(existingIndex, 1);
+			else
+				classes.push(className);
+
+			el.className = classes.join(' ');
+		}
 	};
 
   var major_company_list = [
@@ -235,11 +291,25 @@
   var all_cities = major_us_cities.concat(major_european_cities);
 
   var show_submitted = function(msg) {
-    console.log("SUBMITTED " + msg);
+    el = document.getElementById('flash-info');
+    el.getElementsByTagName("span")[0].innerHTML = msg;
+		fade_in(el, function() { el.style.display = 'none'; });
+    el.style.display = 'block';
   };
- 
+
+  var show_info = function(msg) {
+    info_el = document.getElementById('flash-info');
+    info_el.getElementsByTagName("span")[0].innerHTML = msg;
+		fade_in(info_el, function() { info_el.style.display = 'none'; });
+    info_el.style.display = 'block';
+  };
+
+
   var show_error = function(msg) {
-    console.log("ERROR " + msg);
+    flash_el = document.getElementById('flash-error');
+    flash_el.getElementsByTagName("span")[0].innerHTML = msg;
+		fade_in(flash_el, function() { flash_el.style.display = 'none'; });
+    flash_el.style.display = 'block';
   };
 
   /*
@@ -298,10 +368,10 @@
     xhr.open("POST", UPDATE_URL);
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
+			remove_class(el, "spinner");
+			add_class(el, action);
       if (xhr.status !== 200) {
         show_error(xhr.responseText);	
-        el.className = "";
-        el.className = "rating " + action;
       } else {
         resp = JSON.parse(xhr.responseText);
         if (action === 'cancel') {
@@ -309,15 +379,28 @@
           show_my_ids();
         } else {
           add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
+          show_info("Feedback submitted!");	
 				  remove_elem_by_id(resp.id);
         }
-        el.className = "";
-        el.className = "rating " + action;
       }
     };
-    xhr.send(JSON.stringify(data));
-    el.className = "";
-    el.className = "rating spinner";
+
+    xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4){   //if complete
+        	if(xhr.status === 200){  //check if "OK" (200)
+            //success
+        	} else {
+		  			// remove_class(el, "spinner");
+						remove_class(el, "spinner");
+						add_class(el, action);
+      			show_error("Error sending request.");	
+        	}
+			}
+    };
+
+		xhr.send(JSON.stringify(data));
+		remove_class(el, action);
+    add_class(el, "spinner");
   };
 
 
@@ -393,7 +476,6 @@
   var show_my_ids = function() {
     var item, div, comment,
         local_my_ids;
-    console.log("show my ids");
     local_my_ids = get_array_from_storage(MY_ID_STORAGE);
     div = document.getElementById('pending-comments');
     div.innerHTML = "";
@@ -425,37 +507,50 @@
     });
   };
 
-	var ajax_submit = function(form) {
-			var i, input, resp,
-					ii = form.length,
-					xhr = new XMLHttpRequest(),
-		 			data = {};
+  var ajax_submit = function(form) {
+    disable_all_input(true);
+    var i, input, resp,
+        ii = form.length,
+        xhr = new XMLHttpRequest(),
+        data = {};
 
-      for (i = 0; i < ii; ++i) {
-        input = form[i];
-        if (input.name) {
-          if (input.type === 'radio') {
-            if (input.checked) {
-              data[input.name] = input.value;
-            }
-          } else {
+    for (i = 0; i < ii; ++i) {
+      input = form[i];
+      if (input.name) {
+        if (input.type === 'radio') {
+          if (input.checked) {
             data[input.name] = input.value;
           }
+        } else {
+          data[input.name] = input.value;
         }
       }
-			xhr.open("POST", form.action);
-			xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-			xhr.onload = function() {
-				if (xhr.status !== 200) {
-					show_error(xhr.responseText);	
-				} else {
-          show_submitted("submitted");
-		      resp = JSON.parse(xhr.responseText);
-		      localStorage.setItem(resp.id, JSON.stringify(resp));
-          add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
-				}
-      };
-			xhr.send(JSON.stringify(data));
+    }
+    xhr.open("POST", form.action);
+    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+    xhr.onload = function() {
+      disable_all_input(false);
+      if (xhr.status !== 200) {
+        show_error(xhr.responseText);	
+      } else {
+        show_submitted("Submitted! Your submission will be pending until it is approved by another person viewing the site.");
+        resp = JSON.parse(xhr.responseText);
+        localStorage.setItem(resp.id, JSON.stringify(resp));
+        add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
+      }
+    };
+    xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4){   //if complete
+        	if(xhr.status === 200){  //check if "OK" (200)
+            //success
+        	} else {
+      			show_error("Error sending review request.");	
+      			disable_all_input(false);
+        	}
+			}
+    };
+
+		xhr.send(JSON.stringify(data));
 	};
 
 	var submit_review = function(e) {
@@ -465,9 +560,37 @@
 		ajax_submit(submit_form);
   };
 
+
+
+  var review_textinput = function(el) {
+    if (el.value.length > MAX_LENGTHS[el.id]) {
+      add_class(el, "overflow");
+		} else {
+			remove_class(el, "overflow");
+    }
+  }
+
+	var disable_all_input = function(value) {
+    FORM_IDS.forEach(function(entry) {
+     el = document.getElementById(entry); 
+     el.disabled = value;
+    });
+    e = document.getElementsByName("emoji");
+    e.forEach(function(elem) { elem.disabled = value; });
+  }
+
   var add_event_listeners = function() {
- 		var ele =  document.getElementById("review-submit");
-    add_event_listener("submit", ele, submit_review);
+ 		var sub_el, review_el;
+    review_el = document.getElementById("input-review"); 
+    company_el = document.getElementById("input-company"); 
+    position_el = document.getElementById("input-position"); 
+    location_el = document.getElementById("input-location"); 
+    sub_el = document.getElementById("review-submit");
+    add_event_listener("submit", sub_el, submit_review);
+    add_event_listener("keydown", review_el, function() { review_textinput(review_el); });
+    add_event_listener("keydown", company_el, function() { review_textinput(company_el); });
+    add_event_listener("keydown", position_el, function() { review_textinput(position_el); });
+    add_event_listener("keydown", location_el, function() { review_textinput(location_el); });
   };
 
   var autocompletion = function() {
@@ -493,10 +616,18 @@
 			alert("error");
 		}
 	};
-
+	request.onreadystatechange = function() {
+		if (request.readyState === 4){   //if complete
+				if(request.status === 200){  //check if "OK" (200)
+					//success
+				} else {
+					show_error("Error fetching reviews");	
+				}
+		}
+	};
 	request.onerror = function() {
 		// There was a connection error of some sort
-		alert("error");
+		show_error("Error sending review request.");	
 	};
 
 	request.send();
