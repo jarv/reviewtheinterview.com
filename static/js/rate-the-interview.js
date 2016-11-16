@@ -10,12 +10,22 @@
   var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
   var FORM_IDS = ['input-review', 'input-company',
                   'input-position', 'input-location', 'input-button']
+
+	var MIN_LENGTHS = {
+    'input-company': 3,
+    'input-location': 5,
+    'input-position': 3,
+    'input-review': 20 
+	};
+
 	var MAX_LENGTHS = {
-    'input-company': 20,
-    'input-position': 30,
-    'input-location': 40,
+    'input-company':  30,
+    'input-location': 50,
+    'input-position': 50,
     'input-review': 140
-	}
+	};
+
+  var OVERALL_LENGTH = 140;
 
 	var pad = function(num, size) {
 			var s = "0000" + num;
@@ -130,6 +140,30 @@
 			el.className = classes.join(' ');
 		}
 	};
+
+	var create_cors_request = function(method, url) {
+		var xhr = new XMLHttpRequest();
+		if ("withCredentials" in xhr) {
+
+			// Check if the XMLHttpRequest object has a "withCredentials" property.
+			// "withCredentials" only exists on XMLHTTPRequest2 objects.
+			xhr.open(method, url, true);
+
+		} else if (typeof XDomainRequest != "undefined") {
+
+			// Otherwise, check if XDomainRequest.
+			// XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+			xhr = new XDomainRequest();
+			xhr.open(method, url);
+
+		} else {
+
+			// Otherwise, CORS is not supported by the browser.
+			xhr = null;
+
+		}
+		return xhr;
+	}
 
   var major_company_list = [
     "Apple Inc.",
@@ -356,7 +390,7 @@
 
   var post_update = function(el, id, action) {
     var resp,
-        xhr = new XMLHttpRequest(),
+        xhr = create_cors_request("POST", UPDATE_URL);
         data = {};
 
     data = {
@@ -364,22 +398,20 @@
       "action": action === 'cancel' ? 'reject' : action
     };
 
-    xhr = new XMLHttpRequest();
-    xhr.open("POST", UPDATE_URL);
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
 			remove_class(el, "spinner");
-			add_class(el, action);
       if (xhr.status !== 200) {
         show_error(xhr.responseText);	
       } else {
         resp = JSON.parse(xhr.responseText);
         if (action === 'cancel') {
           remove_id_from_storage(resp.id, MY_ID_STORAGE, null);
+          show_info("Submission removed");	
           show_my_ids();
         } else {
           add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
-          show_info("Feedback submitted!");	
+          show_info("Feedback submitted, thanks!");	
 				  remove_elem_by_id(resp.id);
         }
       }
@@ -390,16 +422,13 @@
         	if(xhr.status === 200){  //check if "OK" (200)
             //success
         	} else {
-		  			// remove_class(el, "spinner");
 						remove_class(el, "spinner");
-						add_class(el, action);
       			show_error("Error sending request.");	
         	}
 			}
     };
 
 		xhr.send(JSON.stringify(data));
-		remove_class(el, action);
     add_class(el, "spinner");
   };
 
@@ -511,9 +540,8 @@
     disable_all_input(true);
     var i, input, resp,
         ii = form.length,
-        xhr = new XMLHttpRequest(),
+        xhr = create_cors_request("POST", form.action);
         data = {};
-
     for (i = 0; i < ii; ++i) {
       input = form[i];
       if (input.name) {
@@ -526,7 +554,7 @@
         }
       }
     }
-    xhr.open("POST", form.action);
+
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
       disable_all_input(false);
@@ -537,6 +565,7 @@
         resp = JSON.parse(xhr.responseText);
         localStorage.setItem(resp.id, JSON.stringify(resp));
         add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
+        clear_input_fields();
       }
     };
     xhr.onreadystatechange = function() {
@@ -561,18 +590,59 @@
   };
 
 
+  var review_all = function(el) {
+    var total = 0;
+    rem_wrap = document.getElementById("num-remaining-wrap");
+    FORM_IDS.forEach(function(id) {
+      f_el = document.getElementById(id);
+      total = total + f_el.value.length
+    });
+    remaining = OVERALL_LENGTH - total;
+    rem_el = document.getElementById("num-remaining");
+    if (remaining > 0) {
+      rem_el.innerHTML = remaining;
+      remove_class(rem_wrap, "red-border");
+    } else {
+      rem_el.innerHTML = "0";
+      add_class(rem_wrap, "red-border");
+    }
+  }
 
   var review_textinput = function(el) {
+		span_el = document.getElementById(el.id.replace('input', 'span'));
+
     if (el.value.length > MAX_LENGTHS[el.id]) {
       add_class(el, "overflow");
+      remove_class(span_el, "valid");
 		} else {
 			remove_class(el, "overflow");
     }
+
+		if (el.value.length <= MAX_LENGTHS[el.id] && el.value.length >= MIN_LENGTHS[el.id]) {
+			add_class(span_el, "valid");
+		} else {
+      remove_class(span_el, "valid");
+    }
+  }
+
+  var clear_input_fields = function() {
+    FORM_IDS.forEach(function(entry) {
+      if (entry == "input-button") {
+        return
+      }
+      f_el = document.getElementById(entry); 
+      f_el.value = "";
+		  span_el = document.getElementById(entry.replace('input', 'span'));
+      if (span_el !== null) {
+        remove_class(span_el, "valid");
+      }
+    });
   }
 
 	var disable_all_input = function(value) {
     FORM_IDS.forEach(function(entry) {
      el = document.getElementById(entry); 
+     value ? add_class(el, "tint") : remove_class(el, "tint");
      el.disabled = value;
     });
     e = document.getElementsByName("emoji");
@@ -587,10 +657,13 @@
     location_el = document.getElementById("input-location"); 
     sub_el = document.getElementById("review-submit");
     add_event_listener("submit", sub_el, submit_review);
-    add_event_listener("keydown", review_el, function() { review_textinput(review_el); });
-    add_event_listener("keydown", company_el, function() { review_textinput(company_el); });
-    add_event_listener("keydown", position_el, function() { review_textinput(position_el); });
-    add_event_listener("keydown", location_el, function() { review_textinput(location_el); });
+    add_event_listener("input", review_el, function() { review_textinput(review_el); });
+    add_event_listener("input", company_el, function() { review_textinput(company_el); });
+    add_event_listener("input", position_el, function() { review_textinput(position_el); });
+    add_event_listener("input", location_el, function() { review_textinput(location_el); });
+    add_event_listener("input", sub_el, function() { review_all(sub_el); });
+    document.addEventListener("touchstart", function(){}, true);
+
   };
 
   var autocompletion = function() {
@@ -605,8 +678,7 @@
   autocompletion();
   show_my_ids();
 
-	var request = new XMLHttpRequest();
-	request.open('GET', '/reviews/reviews.json', true);
+	var request = create_cors_request("GET", "/reviews/reviews.json");
 
 	request.onload = function() {
 		if (request.status >= 200 && request.status < 400) {

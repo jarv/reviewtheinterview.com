@@ -19,6 +19,11 @@ $buttonclr :#599bb3;
 @import "neat/neat";
 @import "base/base";
 
+* {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: transparent; /* For some Androids */
+}
+
 body {
 
   background-color: $p0;
@@ -41,8 +46,6 @@ body {
 .comment-box {
 
 }
-
-.spinner {background-image:url(../img/spinner.gif);}
 
     // 2620 skull
     // 1f4a9 poo
@@ -93,6 +96,21 @@ h2 {
 
 }
 
+h3 {
+  font-size: 1.0em;
+  font-weight: 300;
+  text-align: center;
+  color: lighten($p3, 25%);
+  width: 100%;
+  background-color: darken($p0, 2%);
+  padding: 5px;
+  border: 2px solid $p0;
+}
+
+.red-border {
+  border: 2px solid darken(red, 30%);
+}
+
 .submission {
   // too many characters
   .overflow {
@@ -131,7 +149,9 @@ h2 {
     display: inline-block;
   }
 
-  
+  .tint {
+    background-color: tint($p0, 50%);
+  }
   input[type=text] {
     display: inline-block;
     border-radius: 5px;
@@ -345,3 +365,71 @@ $base-spacing: 1.5em !default;
   z-index: 1000;
 }
 
+// spinner
+
+.spinner {
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 400ms;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: spin;
+    -moz-animation-duration: 400ms;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: spin;
+    -ms-animation-duration: 400ms;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    animation-name: spin;
+    animation-duration: 400ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+z-index: 10000;
+}
+@-ms-keyframes spin {
+    from { -ms-transform: rotate(0deg); }
+    to { -ms-transform: rotate(360deg); }
+}
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
+
+
+// checkmarks
+//
+input.valid {
+
+  color: green;
+  width: 200px;
+}
+div.input-wrapper {
+  position: relative;
+}
+span.valid {
+
+  font-weight:bold;
+  font-size: 2em;
+  display: block;
+  position: absolute;
+  right: 5px;
+  top: -10px; 
+}
+
+span.valid:after {
+
+  content:"\2713";
+  color: green;
+}

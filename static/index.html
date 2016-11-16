@@ -16,9 +16,9 @@
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
-			<!--[if lt IE 8]>
-					<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-			<![endif]-->
+            <!--[if lt IE 8]>
+                    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+            <![endif]-->
 
       <div id="flash-error" class="flash">
           <span>This is an error message</span>
@@ -27,7 +27,7 @@
           <span>This is an info message</span>
       </div>
 
-			<div class="wrapper">
+            <div class="wrapper">
         <div class="header-box">
           <h1>Rate the Interview</h1>
         </div> 
@@ -36,11 +36,12 @@
           <div class="submission">
             <form id="review-submit" action="https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/submit">
               <ul>
-                <li><input type="text" class="awesomplete" id="input-company" placeholder="Company Name - ex: Google" name="company" /></li>
-                <li><input type="text" class="awesomplete" id="input-position" placeholder="Position - ex: Software Engineer" name="position" /></li>
-                <li><input type="text" class="awesomplete" id="input-location" placeholder="Location - ex: Boston, Massachusetts" name="location" /></li>
-                <li><textarea id="input-review" placeholder="review limit: 140 characters" name="review"></textarea></li>
+                <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-company" placeholder="Company Name - ex: Google" name="company" /><span id="span-company"></span></div></li>
+                <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-position" placeholder="Position - ex: Software Engineer" name="position" /><span id="span-position"></span></div></li>
+                <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-location" placeholder="Location - ex: Boston, Massachusetts" name="location" /><span id="span-location"></span></div></li>
+                <li><div class="input-wrapper"><textarea id="input-review" placeholder="review limit: 140 characters" name="review"></textarea><span id="span-review"></span></div></li>
               </ul>
+              <h3 id="num-remaining-wrap">- <span id="num-remaining">140</span> characters remaining -</h3>
               <div class="emoji-selector">
                 <input id="e1f620" type="radio" name="emoji" value="e1f620">
                 <label for="e1f620" class="rating e1f620"></label>
@@ -81,20 +82,20 @@
 
       <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
       <!-- <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script> -->
-			<script src="js/plugins.js"></script>
+            <script src="js/plugins.js"></script>
       <script src="js/awesomplete.js"></script>
       <script src="js/rate-the-interview.js"></script>
 
 
-			<!-- Google Analytics: change UA-XXXXX-X to be your site's ID.
-			<script>
-					(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-					function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-					e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-					e.src='//www.google-analytics.com/analytics.js';
-					r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-					ga('create','UA-XXXXX-X','auto');ga('send','pageview');
-			</script>
+            <!-- Google Analytics: change UA-XXXXX-X to be your site's ID.
+            <script>
+                    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+                    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+                    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+                    e.src='//www.google-analytics.com/analytics.js';
+                    r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+                    ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+            </script>
       -->
     </body>
 </html>

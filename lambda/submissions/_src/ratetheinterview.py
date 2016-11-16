@@ -20,10 +20,10 @@ class submit:
 
 
 class max_lengths:
-    company = 40
+    company = 30
     emoji = 10
-    location = 60
-    position = 60
+    location = 50
+    position = 50
     review = 140
 
 SUBMIT_FIELDS = set([submit.company,
@@ -53,6 +53,7 @@ def respond(err, res=None):
         'body': err.message if err else json.dumps(res),
         'headers': {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin' : "*"
         },
     }
 
