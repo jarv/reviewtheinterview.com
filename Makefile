@@ -16,4 +16,4 @@ runserver:
 flower:
 	cd watcher;DJANGO_SETTINGS_MODULE=watcher.settings celery -A watcher.tasks flower --port=5556
 sync:
-	aws --region us-west-2 --profile reviewtheinterview s3 sync --acl public-read $(OUTPUTDIR)/ s3://testing.reviewtheinterview.com
+	aws --region us-east-1 --profile reviewtheinterview s3 sync --exclude "pending/pending-reviews.json" --exclude "reviews/reviews.json" --acl public-read $(OUTPUTDIR)/ s3://testing.reviewtheinterview.com

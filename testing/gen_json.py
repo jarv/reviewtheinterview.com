@@ -45,7 +45,7 @@ if 'Items' in r:
         delete_item(i['id'])
 
 # pending
-p = s.scan(FilterExpression=pending, Limit=20)
+p = s.scan(FilterExpression=pending)
 if 'Items' in p:
     pending = [{k: value_convert(d[k]) for k in FIELDS} for d in p['Items']]
     pending_contents = StringIO(json.dumps(pending, indent=4, sort_keys=True))
@@ -53,7 +53,7 @@ if 'Items' in p:
     bucket.put_object(ACL='public-read', Bucket=BUCKET, Key=PENDING_KEY, Body=pending_contents.read())
 
 # approved
-a = s.scan(FilterExpression=approved, Limit=20)
+a = s.scan(FilterExpression=approved)
 if 'Items' in a:
     approved = [{k: value_convert(d[k]) for k in FIELDS} for d in a['Items']]
     approved_contents = StringIO(json.dumps(approved, indent=4, sort_keys=True))

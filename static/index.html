@@ -9,7 +9,7 @@
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
         <link rel="stylesheet" href="css/normalize.min.css">
-        <link rel="stylesheet" href="css/rate-the-interview.css">
+        <link rel="stylesheet" href="css/review-the-interview.css">
         <link rel="stylesheet" href="css/awesomplete.css" /> 
         <link rel="stylesheet" href="css/animate.min.css">
 
@@ -61,13 +61,20 @@
           </div>
         </div>
 
-        <div class="pending-submissions">
+        <div id="your-submissions" class="your-submissions" style="display: none;">
+          <div class="divider-box">
+            <div class="line-behind-text"><h6>Your Submissions</h6></div>
+          </div>
+          <div id="your-comments" class="comment-box">
+          </div>
+        </div>
+
+
+        <div id="pending-submissions" class="pending-submissions" style="display: none;">
           <div class="divider-box">
             <div class="line-behind-text"><h6>Pending Submissions</h6></div>
           </div>
-
           <div id="pending-comments" class="comment-box">
-
           </div>
         </div>
 
@@ -80,11 +87,10 @@
         </div>
       </div>
 
-      <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
-      <!-- <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script> -->
-            <script src="js/plugins.js"></script>
+      <script src="js/plugins.js"></script>
+      <script src="js/vendor/underscore-min.js"></script>
       <script src="js/awesomplete.js"></script>
-      <script src="js/rate-the-interview.js"></script>
+      <script src="js/review-the-interview.js"></script>
 
 
             <!-- Google Analytics: change UA-XXXXX-X to be your site's ID.

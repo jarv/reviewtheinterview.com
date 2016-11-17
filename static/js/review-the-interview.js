@@ -32,19 +32,6 @@
 			return s.substr(s.length-size);
 	};
 
-	var array_unique = function(array) {
-    var a, i, j;
-    a = array.concat();
-    for(i=0; i<a.length; ++i) {
-      for(j=i+1; j<a.length; ++j) {
-        if(a[i] === a[j]) {
-            a.splice(j--, 1);
-        }
-      }
-    }
-    return a;
-	};
-
 	var time_convert = function(t) {     
 		var a = new Date(t * 10),
 				today = new Date(),
@@ -74,19 +61,6 @@
       obj.attachEvent("on"+event, fn); // old ie
     }
   };
-
-	var remove_from_array = function(arr) {
-			var what, a = arguments, L = a.length, ax;
-			while (L > 1 && arr.length) {
-					what = a[--L];
-					ax = arr.indexOf(what);
-					while (ax !== -1) {
-					  arr.splice(ax, 1);
-					  ax = arr.indexOf(what);
-					}
-			}
-			return arr;
-	};
 
 	var remove_elem_by_id = function(id) {
 			var elem = document.getElementById(id);
@@ -368,19 +342,21 @@
   var remove_id_from_storage = function(id, storage_name, callback) {
     var local_ids, json_ids;
     local_ids = get_array_from_storage(storage_name);
-    json_ids = JSON.stringify(remove_from_array(local_ids, id));
+    json_ids = JSON.stringify(_.without(local_ids,id));
 		localStorage.setItem(storage_name, json_ids);
-
     if (typeof callback === 'function') {
       callback();
     }
+  };
+
+  var id_in_storage = function(id, storage_name, callback) {
   };
 
   var add_id_to_storage = function(id, storage_name, callback) {
     var local_ids, json_ids;
     local_ids = get_array_from_storage(storage_name);
     
-    json_ids = JSON.stringify(array_unique(local_ids.concat([id])));
+    json_ids = JSON.stringify(_.uniq(local_ids.concat([id])));
 		localStorage.setItem(storage_name, json_ids);
 
     if (typeof callback === 'function') {
@@ -510,10 +486,17 @@
 
 
   var show_my_ids = function() {
-    var item, div, comment,
+    var item, div, comment, ydiv,
         local_my_ids;
     local_my_ids = get_array_from_storage(MY_ID_STORAGE);
-    div = document.getElementById('pending-comments');
+    ydiv = document.getElementById('your-submissions');
+    if (local_my_ids.length === 0) {
+      ydiv.style.display = 'none';
+    } else {   
+      ydiv.style.display = '';
+    }
+
+    div = document.getElementById('your-comments');
     div.innerHTML = "";
     local_my_ids.reverse().forEach( function(id) {
       item = JSON.parse(localStorage.getItem(id));
@@ -533,10 +516,13 @@
 */
 
 
-  var add_comments = function(data) {
+  var add_reviews = function(data, wrapper_id) {
     var comment,
-        div = document.getElementById('comments');
+        div = document.getElementById(wrapper_id);
     data.forEach( function(item) {
+      if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
+        return;
+      }
       comment = create_comment(item);
       div.appendChild(comment);
       add_emoji_style(item);
@@ -683,35 +669,75 @@
     var complete_location = new Awesomplete(document.getElementById("input-location"));
     complete_location.list = all_cities;
   };
+
+
+  var show_pending_reviews = function() {
+    var pdiv, request, data;
+    request = create_cors_request("GET", "/pending-reviews/pending-reviews.json");
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        data = JSON.parse(request.responseText);
+        pdiv = document.getElementById('pending-submissions');
+        if (data.length === 0) {
+          pdiv.style.display = 'none';
+        } else {   
+          pdiv.style.display = '';
+          add_reviews(_.sample(data, 2), 'pending-comments');
+        }
+      } else {
+        show_error("Unable to get pending reviews");
+      }
+    };
+    request.onreadystatechange = function() {
+      if (request.readyState === 4){   //if complete
+          if(request.status === 200){  //check if "OK" (200)
+            //success
+          } else {
+            show_error("Error fetching pending reviews");	
+          }
+      }
+    };
+    request.onerror = function() {
+      // There was a connection error of some sort
+      show_error("Error sending review request.");	
+    };
+
+    request.send();
+  }
+
+  var show_reviews = function() {
+    var request = create_cors_request("GET", "/reviews/reviews.json");
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        var data = JSON.parse(request.responseText);
+        add_reviews(data, 'comments');
+      } else {
+        show_error("Unable to get reviews");
+      }
+    };
+    request.onreadystatechange = function() {
+      if (request.readyState === 4){   //if complete
+          if(request.status === 200){  //check if "OK" (200)
+            //success
+          } else {
+            show_error("Error fetching reviews");	
+          }
+      }
+    };
+    request.onerror = function() {
+      // There was a connection error of some sort
+      show_error("Error sending review request.");	
+    };
+
+    request.send();
+  }
   // ----------------
 
   add_event_listeners();
   autocompletion();
   show_my_ids();
+  show_reviews();
+  show_pending_reviews();
 
-	var request = create_cors_request("GET", "/reviews/reviews.json");
 
-	request.onload = function() {
-		if (request.status >= 200 && request.status < 400) {
-			var data = JSON.parse(request.responseText);
-      add_comments(data);
-		} else {
-			alert("error");
-		}
-	};
-	request.onreadystatechange = function() {
-		if (request.readyState === 4){   //if complete
-				if(request.status === 200){  //check if "OK" (200)
-					//success
-				} else {
-					show_error("Error fetching reviews");	
-				}
-		}
-	};
-	request.onerror = function() {
-		// There was a connection error of some sort
-		show_error("Error sending review request.");	
-	};
-
-	request.send();
 }());
