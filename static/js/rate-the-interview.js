@@ -9,13 +9,13 @@
   var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
   var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
   var FORM_IDS = ['input-review', 'input-company',
-                  'input-position', 'input-location', 'input-button']
+                  'input-position', 'input-location', 'input-button'];
 
 	var MIN_LENGTHS = {
     'input-company': 3,
     'input-location': 5,
     'input-position': 3,
-    'input-review': 20 
+    'input-review': 10
 	};
 
 	var MAX_LENGTHS = {
@@ -116,7 +116,7 @@
 			el.classList.add(class_name);
 		else
 			el.class_name += ' ' + class_name;
-  }
+  };
 
 	var remove_class = function(el, class_name) {
 		if (el.classList)
@@ -163,7 +163,7 @@
 
 		}
 		return xhr;
-	}
+	};
 
   var major_company_list = [
     "Apple Inc.",
@@ -395,8 +395,15 @@
 
     data = {
       "id": id,
-      "action": action === 'cancel' ? 'reject' : action
+      "action": action
     };
+
+    item = JSON.parse(localStorage.getItem(id));
+    if (item === null) {
+      data.key = "";
+    } else {
+      data.key = item.key;
+    }
 
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
@@ -595,7 +602,7 @@
     rem_wrap = document.getElementById("num-remaining-wrap");
     FORM_IDS.forEach(function(id) {
       f_el = document.getElementById(id);
-      total = total + f_el.value.length
+      total = total + f_el.value.length;
     });
     remaining = OVERALL_LENGTH - total;
     rem_el = document.getElementById("num-remaining");
@@ -606,7 +613,7 @@
       rem_el.innerHTML = "0";
       add_class(rem_wrap, "red-border");
     }
-  }
+  };
 
   var review_textinput = function(el) {
 		span_el = document.getElementById(el.id.replace('input', 'span'));
@@ -623,12 +630,12 @@
 		} else {
       remove_class(span_el, "valid");
     }
-  }
+  };
 
   var clear_input_fields = function() {
     FORM_IDS.forEach(function(entry) {
       if (entry == "input-button") {
-        return
+        return;
       }
       f_el = document.getElementById(entry); 
       f_el.value = "";
@@ -637,17 +644,21 @@
         remove_class(span_el, "valid");
       }
     });
-  }
+  };
 
 	var disable_all_input = function(value) {
     FORM_IDS.forEach(function(entry) {
      el = document.getElementById(entry); 
-     value ? add_class(el, "tint") : remove_class(el, "tint");
+     if (value) {
+      add_class(el, "tint");
+     } else {
+      remove_class(el, "tint");
+     }
      el.disabled = value;
     });
     e = document.getElementsByName("emoji");
     e.forEach(function(elem) { elem.disabled = value; });
-  }
+  };
 
   var add_event_listeners = function() {
  		var sub_el, review_el;

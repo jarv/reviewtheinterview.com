@@ -4,8 +4,10 @@ import json
 import boto3
 import re
 import time
-from boto3.dynamodb.conditions import Key
 import decimal
+
+# b = boto3.session.Session(profile_name='ratetheinterview', region_name='us-east-1')
+# s = b.resource('dynamodb').Table("ratetheinterview-submissions")
 
 
 class ValidationError(Exception):
@@ -15,6 +17,7 @@ class ValidationError(Exception):
 class update:
     id = "id"
     action = "action"
+    key = "key"
 
 
 class actions:
@@ -22,22 +25,31 @@ class actions:
     poo = "poo"
     approve = "approve"
     reject = "reject"
+    cancel = "cancel"
 
 
 class max_lengths:
     id = 38
     action = 100
+    key = 39
+
+
+class regex_matches:
+    id = '^[\w_-]+$'
+    action = '^[\w_-]+$'
+    key = '.*'
 
 UPDATE_FIELDS = set([update.id,
                      update.action,
+                     update.key,
                      ])
 
 ACTION_FIELDS = set([actions.love,
                      actions.poo,
                      actions.approve,
-                     actions.reject])
+                     actions.reject,
+                     actions.cancel])
 
-REGEX_MATCH = '^[\w_-]+$'
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
@@ -72,7 +84,7 @@ def validated_body(body):
     for value in UPDATE_FIELDS:
         if len(body[value]) > getattr(max_lengths, value):
             raise ValidationError("{} length is too long.".format(value))
-        if not re.match(REGEX_MATCH, body[value]):
+        if not re.match(getattr(regex_matches, value), body[value]):
             raise ValidationError("{} has invalid characters.".format(value))
     if body[update.action] not in ACTION_FIELDS:
         raise ValidationError("{} is not a valid action.".format(body[update.action]))
@@ -80,16 +92,16 @@ def validated_body(body):
     return {k: body[k] for k in UPDATE_FIELDS}
 
 
-def get_entry_from_id(key_id):
+def get_item_from_id(key_id):
     dynamo_submissions = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
     try:
-        q = dynamo_submissions.query(KeyConditionExpression=Key('id').eq(key_id))
+        q = dynamo_submissions.get_item(Key={'id': key_id})
     except Exception, e:
         LOG.exception("Error querying the database for {}: {}".format(key_id, e.message))
         raise ValidationError("Database error.")
-    if q['Count'] != 1:
+    if 'Item' not in q:
         raise ValidationError("Unable to find id: {}".format(key_id))
-    return q
+    return q['Item']
 
 
 def increment_action(key_id, action):
@@ -117,6 +129,16 @@ def add_updates_for_action(item):
     except Exception, e:
         LOG.exception("Error updating the {} table with {} : {} ".format(
             UPDATES_TABLE_NAME, item_to_put, e.message))
+        raise ValidationError("Database error.")
+
+
+def delete_item(key_id):
+    dynamo_submissions = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
+    try:
+        dynamo_submissions.delete_item(Key={'id': key_id})
+    except Exception, e:
+        LOG.exception("Error deleting from the {} table with key={} : {} ".format(
+            SUBMISSIONS_TABLE_NAME, key_id, e.message))
         raise ValidationError("Database error.")
 
 
@@ -149,15 +171,23 @@ def handler(event, context):
         req_fields['user_agent'] = identity['userAgent']
         req_fields['source_ip'] = identity['sourceIp']
     else:
-        for field in ['user_agent', 'source_id']:
-            req_fields[field] = "dummy {}".format(field)
+        req_fields['user_agent'] = "dummy user agent"
+        req_fields['source_ip'] = "1.1.1.1"
 
     try:
-        entry = get_entry_from_id(ret_body['id'])
-        key_id = entry['Items'][0]['id']
-        increment_action(key_id, ret_body['action'])
-        item = merge_two_dicts({"action": ret_body['action'], "id": key_id}, req_fields)
-        add_updates_for_action(item)
+        item = get_item_from_id(ret_body['id'])
+        key_id = item['id']
+        if ret_body['action'] == actions.cancel:
+            if update.key not in item or update.key not in ret_body:
+                raise ValidationError("Unable to cancel submission")
+            if item['key'] != ret_body['key']:
+                # fake the delete even though it won't be done
+                return respond(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})
+            delete_item(key_id)
+        else:
+            increment_action(key_id, ret_body['action'])
+        item_new = merge_two_dicts(item, req_fields)
+        add_updates_for_action(merge_two_dicts({"action": ret_body['action']}, item_new))
     except ValidationError, e:
         return respond(e)
 

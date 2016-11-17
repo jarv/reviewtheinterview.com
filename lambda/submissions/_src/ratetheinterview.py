@@ -26,6 +26,14 @@ class max_lengths:
     position = 50
     review = 140
 
+
+class min_lengths:
+    company = 3
+    emoji = 5
+    location = 5
+    position = 3
+    review = 10
+
 SUBMIT_FIELDS = set([submit.company,
                      submit.emoji,
                      submit.location,
@@ -33,11 +41,25 @@ SUBMIT_FIELDS = set([submit.company,
                      submit.review,
                      ])
 
+OVERALL_LENGTH = 140
 REGEX_MATCH = "^[A-Za-z\s0-9!:$@#%^&*(),]+$"
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
-TABLE_NAME = 'ratetheinterview-submissions'
+SUBMISSIONS_TABLE_NAME = 'ratetheinterview-submissions'
+UPDATES_TABLE_NAME = 'ratetheinterview-updates'
+
+
+def add_updates_for_action(item):
+    dynamo_updates = boto3.resource('dynamodb').Table(UPDATES_TABLE_NAME)
+    t = int(time.time() * 100)
+    try:
+        item_to_put = merge_two_dicts(item, {'create_time': t})
+        dynamo_updates.put_item(Item=item_to_put)
+    except Exception, e:
+        LOG.exception("Error updating the {} table with {} : {} ".format(
+            UPDATES_TABLE_NAME, item_to_put, e.message))
+        raise ValidationError("Database error.")
 
 
 def merge_two_dicts(x, y):
@@ -53,7 +75,7 @@ def respond(err, res=None):
         'body': err.message if err else json.dumps(res),
         'headers': {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin' : "*"
+            'Access-Control-Allow-Origin': "*"
         },
     }
 
@@ -62,9 +84,13 @@ def validated_body(body):
     if set(body.keys()) != SUBMIT_FIELDS:
         raise ValidationError("Wrong values in request, expecting: {}, got: {}".format(
             ",".join(list(SUBMIT_FIELDS)), ",".join(body.keys())))
+    if sum(len(body[value]) for value in SUBMIT_FIELDS if value != 'emoji') > OVERALL_LENGTH:
+        raise ValidationError("Submission is over {} chars".format(OVERALL_LENGTH))
     for value in SUBMIT_FIELDS:
         if len(body[value]) > getattr(max_lengths, value):
-            raise ValidationError("{} length is too long.".format(value))
+            raise ValidationError("{} field must be less than {}.".format(value, getattr(max_lengths, value)))
+        if len(body[value]) < getattr(min_lengths, value):
+            raise ValidationError("{} field must be greater than {}.".format(value, getattr(min_lengths, value)))
         if not re.match(REGEX_MATCH, body[value]):
             raise ValidationError("{} has invalid characters.".format(value))
     return {k: body[k] for k in SUBMIT_FIELDS}
@@ -98,20 +124,28 @@ def handler(event, context):
         req_fields['user_agent'] = identity['userAgent']
         req_fields['source_ip'] = identity['sourceIp']
     else:
-        for field in ['user_agent', 'source_id']:
-            req_fields[field] = "dummy {}".format(field)
+        req_fields['user_agent'] = "dummy user agent"
+        req_fields['source_ip'] = "1.1.1.1"
 
     # prefix with "id" so we can use it for css id selectors
     u = "id" + str(uuid.uuid4())
+    key = "key" + str(uuid.uuid4())
 
     ret_body['id'] = u
-    dynamo = boto3.resource('dynamodb').Table(TABLE_NAME)
+    ret_body['key'] = key
+    dynamo = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
     t = int(time.time() * 100)
     ret_body['create_time'] = t
     ret_body['update_time'] = t
-    item = merge_two_dicts(ret_body, req_fields)
     try:
+        item = merge_two_dicts(ret_body, req_fields)
         put = dynamo.put_item(Item=item)
+    except Exception as e:
+        LOG.exception("Error adding entry to the database: {}".format(item))
+        return respond(Exception('Database error'))
+
+    try:
+        add_updates_for_action(merge_two_dicts({"action": "submit"}, item))
     except Exception as e:
         LOG.exception("Error adding entry to the database: {}".format(item))
         return respond(Exception('Database error'))
