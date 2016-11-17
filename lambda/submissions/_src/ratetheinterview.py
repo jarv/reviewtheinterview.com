@@ -46,8 +46,8 @@ REGEX_MATCH = "^[A-Za-z\s0-9!:$@#%^&*(),]+$"
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
-SUBMISSIONS_TABLE_NAME = 'ratetheinterview-submissions'
-UPDATES_TABLE_NAME = 'ratetheinterview-updates'
+SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
+UPDATES_TABLE_NAME = 'reviewtheinterview-updates'
 
 
 def add_updates_for_action(item):

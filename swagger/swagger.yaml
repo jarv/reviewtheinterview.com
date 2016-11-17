@@ -7,7 +7,7 @@ info:
     Rate the Interview
 schemes:
   - http
-host: ratetheinterview.com
+host: reviewtheinterview.com
 basePath: /
 paths:
   /submit:

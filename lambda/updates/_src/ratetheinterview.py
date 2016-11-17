@@ -6,8 +6,8 @@ import re
 import time
 import decimal
 
-# b = boto3.session.Session(profile_name='ratetheinterview', region_name='us-east-1')
-# s = b.resource('dynamodb').Table("ratetheinterview-submissions")
+# b = boto3.session.Session(profile_name='reviewtheinterview', region_name='us-east-1')
+# s = b.resource('dynamodb').Table("reviewtheinterview-submissions")
 
 
 class ValidationError(Exception):
@@ -53,8 +53,8 @@ ACTION_FIELDS = set([actions.love,
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
-UPDATES_TABLE_NAME = 'ratetheinterview-updates'
-SUBMISSIONS_TABLE_NAME = 'ratetheinterview-submissions'
+UPDATES_TABLE_NAME = 'reviewtheinterview-updates'
+SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
 
 
 def merge_two_dicts(x, y):
