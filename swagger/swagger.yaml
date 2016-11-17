@@ -2,9 +2,9 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Rate the Interview
+  title: Review the Interview
   description: |
-    Rate the Interview
+    Review the Interview
 schemes:
   - http
 host: reviewtheinterview.com

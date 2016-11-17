@@ -5,7 +5,7 @@
 /*global localStorage: false*/
 (function() {
 
-  var UPDATE_URL = "https://9w8m8oaxla.execute-api.us-east-1.amazonaws.com/prod/update";
+  var UPDATE_URL = "https://3x1gqtafv9.execute-api.us-east-1.amazonaws.com/prod/update";
   var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
   var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
   var FORM_IDS = ['input-review', 'input-company',

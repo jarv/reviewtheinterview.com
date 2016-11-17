@@ -2,8 +2,8 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "Rate the Interview",
-        "description": "Rate the Interview\n"
+        "title": "Review the Interview",
+        "description": "Review the Interview\n"
     },
     "schemes": [
         "http"
