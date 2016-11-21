@@ -415,12 +415,12 @@
       ydiv.style.display = '';
     }
 
-    div = document.getElementById('your-submissions');
+    div = document.getElementById('your-comments');
     div.innerHTML = "";
     local_my_ids.reverse().forEach( function(id) {
       item = JSON.parse(localStorage.getItem(id));
       item.myid = "true";
-      comment = create_comment(item);
+      comment = create_comment(item, 'your-comments');
       div.appendChild(comment);
       add_emoji_style(item);
     });
@@ -478,7 +478,7 @@
   };
 
 
-  create_comment = function(item) {
+  create_comment = function(item, type) {
     var div_c = document.createElement('div');
     div_c.setAttribute("class", "comment animated bounceIn");
 
@@ -504,17 +504,17 @@
     // 2611 check
     // 2705 check2
     // 274c cancel
-    if (item.myid === "true") {
+    if (type === "your-comments") {
       var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel");
       b.appendChild(b1);
       add_event_listener("click", b1, function() { post_update(b1, item.id, 'cancel');   });
-    } else if (item.pending === "true") {
+    } else if (type === "pending-comments") {
       var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve");
       var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject");
       b.appendChild(b2); b.appendChild(b3);
       add_event_listener("click", b2, function() { post_update(b2, item.id, 'approve'); });
       add_event_listener("click", b3, function() { post_update(b3, item.id, 'reject'); });
-    } else {
+    } else { // type === comments
       var b4 = document.createElement('div'); b4.setAttribute("class", "rating love");
       var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo");
       b.appendChild(b4); b.appendChild(b5);
@@ -546,17 +546,18 @@
     head.appendChild(style);
   };
 
-  add_reviews = function(data, wrapper_id) {
+  add_reviews = function(data, wrapper_id, callback) {
     var comment,
         div = document.getElementById(wrapper_id);
     data.forEach( function(item) {
       if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
         return;
       }
-      comment = create_comment(item);
+      comment = create_comment(item, wrapper_id);
       div.appendChild(comment);
       add_emoji_style(item);
     });
+    if (typeof callback === 'function') { callback(); }
   };
 
   ajax_submit = function(form) {
@@ -676,18 +677,12 @@
 
 
   show_pending_reviews = function() {
-    var pdiv, request, data;
+    var request, data;
     request = create_cors_request("GET", "/pending-reviews/pending-reviews.json");
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
         data = JSON.parse(request.responseText);
-        pdiv = document.getElementById('pending-submissions');
-        if (data.length === 0) {
-          pdiv.style.display = 'none';
-        } else {   
-          pdiv.style.display = '';
-          add_reviews(_.sample(data, 2), 'pending-comments');
-        }
+				add_reviews(_.sample(data, 2), 'pending-comments', update_pending_divider);
       } else {
         fade_in_out("Unable to get pending reviews", "flash-error");
       }
@@ -738,6 +733,4 @@
   show_my_ids();
   show_reviews();
   show_pending_reviews();
-
-
 }());
