@@ -3,6 +3,9 @@
 /*global document: false*/
 /*global Awesomplete: false*/
 /*global localStorage: false*/
+/*global XDomainRequest: false*/
+/*global _: false*/
+
 (function() {
 
   var UPDATE_URL = "https://3x1gqtafv9.execute-api.us-east-1.amazonaws.com/prod/update";
@@ -27,12 +30,12 @@
 
   var OVERALL_LENGTH = 140;
 
-	var pad = function(num, size) {
+	function pad(num, size) {
 			var s = "0000" + num;
 			return s.substr(s.length-size);
 	};
 
-	var time_convert = function(t) {     
+	function time_convert(t) {     
 		var a = new Date(t * 10),
 				today = new Date(),
 				yesterday = new Date(Date.now() - 86400000),
@@ -54,7 +57,7 @@
     return date + ' ' + month + ' ' + year + ', ' + pad(hour, 2) + ':' + pad(min, 2);
 	};
 
-  var add_event_listener = function(event, obj, fn) {
+  function add_event_listener(event, obj, fn) {
     if (obj.addEventListener) {
       obj.addEventListener(event, fn, false);
     } else {
@@ -62,68 +65,46 @@
     }
   };
 
-	var remove_elem_by_id = function(id) {
-			var elem = document.getElementById(id);
-			return elem.parentNode.removeChild(elem);
-	};
-
-	var fade_in = function(el, callback) {
-		el.style.opacity = 0;
-
-		var last = +new Date();
-		var tick = function() {
-			el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
-			last = +new Date();
-
-			if (+el.style.opacity < 1) {
-				(window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
-			} else {
-        setTimeout(callback, 5000);
-      }
-		};
-
-		tick();
-	};
-
   var add_class = function(el, class_name) {
-		if (el.classList)
+		if (el.classList) {
 			el.classList.add(class_name);
-		else
+    } else {
 			el.class_name += ' ' + class_name;
+    }
   };
 
 	var remove_class = function(el, class_name) {
-		if (el.classList)
-			el.classList.remove(class_name);
-		else
-			el.class_name = el.class_name.replace(new RegExp('(^|\\b)' + class_name.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-	};
-
-	var toggle_class = function(el, className) {
 		if (el.classList) {
-			el.classList.toggle(className);
-		} else {
-			var classes = el.className.split(' ');
-			var existingIndex = classes.indexOf(className);
-
-			if (existingIndex >= 0)
-				classes.splice(existingIndex, 1);
-			else
-				classes.push(className);
-
-			el.className = classes.join(' ');
-		}
+			el.classList.remove(class_name);
+    } else {
+			el.class_name = el.class_name.replace(new RegExp('(^|\\b)' + class_name.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+    }
 	};
+
+  var fade_in_add = function(el, to_add, callback) {
+    add_class(el, "fadeIn");  
+    el.appendChild(to_add);
+    if (typeof callback === 'function') { callback(); }
+  };
+
+  var fade_out_delete = function(el, callback) {
+    add_class(el, "fadeOut");  
+    setTimeout(function() {
+	    el.parentNode.removeChild(el);
+      remove_class(el, "fadeOut");
+      if (typeof callback === 'function') { callback(); }
+    }, 1000);
+  };
 
 	var create_cors_request = function(method, url) {
 		var xhr = new XMLHttpRequest();
-		if ("withCredentials" in xhr) {
+		if (xhr.withCredentials === undefined) {
 
 			// Check if the XMLHttpRequest object has a "withCredentials" property.
 			// "withCredentials" only exists on XMLHTTPRequest2 objects.
 			xhr.open(method, url, true);
 
-		} else if (typeof XDomainRequest != "undefined") {
+		} else if (XDomainRequest !== "undefined") {
 
 			// Otherwise, check if XDomainRequest.
 			// XDomainRequest only exists in IE, and is IE's way of making CORS requests.
@@ -298,33 +279,44 @@
   
   var all_cities = major_us_cities.concat(major_european_cities);
 
-  var show_submitted = function(msg) {
-    el = document.getElementById('flash-info');
-    el.getElementsByTagName("span")[0].innerHTML = msg;
-		fade_in(el, function() { el.style.display = 'none'; });
-    el.style.display = 'block';
+  var clear_input_fields = function() {
+    var f_el, span_el;
+    FORM_IDS.forEach(function(entry) {
+      if (entry === "input-button") {
+        return;
+      }
+      f_el = document.getElementById(entry); 
+      f_el.value = "";
+		  span_el = document.getElementById(entry.replace('input', 'span'));
+      if (span_el !== null) {
+        remove_class(span_el, "valid");
+      }
+    });
   };
 
-  var show_info = function(msg) {
-    info_el = document.getElementById('flash-info');
-    info_el.getElementsByTagName("span")[0].innerHTML = msg;
-		fade_in(info_el, function() { info_el.style.display = 'none'; });
-    info_el.style.display = 'block';
+
+	var disable_all_input = function(value) {
+    var el, e;
+    FORM_IDS.forEach(function(entry) {
+     el = document.getElementById(entry); 
+     if (value) {
+      add_class(el, "tint");
+     } else {
+      remove_class(el, "tint");
+     }
+     el.disabled = value;
+    });
+    e = document.getElementsByName("emoji");
+    e.forEach(function(elem) { elem.disabled = value; });
   };
 
-
-  var show_error = function(msg) {
-    flash_el = document.getElementById('flash-error');
-    flash_el.getElementsByTagName("span")[0].innerHTML = msg;
-		fade_in(flash_el, function() { flash_el.style.display = 'none'; });
-    flash_el.style.display = 'block';
+  var fade_in_out = function(msg, id) {
+    var el, to_add;
+    el = document.getElementById(id);
+    to_add = document.createElement('span');
+    to_add.innerHTML = msg;
+		fade_in_add(el, to_add, function() { fade_out_delete(to_add); });
   };
-
-  /*
-  var show_inprogress = function(msg) {
-
-  };
-  */
 
   var get_array_from_storage = function(storage_name) {
     var ids;
@@ -349,9 +341,6 @@
     }
   };
 
-  var id_in_storage = function(id, storage_name, callback) {
-  };
-
   var add_id_to_storage = function(id, storage_name, callback) {
     var local_ids, json_ids;
     local_ids = get_array_from_storage(storage_name);
@@ -364,61 +353,19 @@
     }
   };
 
-  var post_update = function(el, id, action) {
-    var resp,
-        xhr = create_cors_request("POST", UPDATE_URL);
-        data = {};
-
-    data = {
-      "id": id,
-      "action": action
-    };
-
-    item = JSON.parse(localStorage.getItem(id));
-    if (item === null) {
-      data.key = "";
-    } else {
-      data.key = item.key;
+  var update_pending_divider = function() {
+    var pdiv = document.getElementById('pending-submissions'),
+        children = document.getElementById("pending-comments").childElementCount;
+    if (children === 0) {
+      pdiv.style.display = 'none';
+    } else {   
+      pdiv.style.display = '';
     }
-
-    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-    xhr.onload = function() {
-			remove_class(el, "spinner");
-      if (xhr.status !== 200) {
-        show_error(xhr.responseText);	
-      } else {
-        resp = JSON.parse(xhr.responseText);
-        if (action === 'cancel') {
-          remove_id_from_storage(resp.id, MY_ID_STORAGE, null);
-          show_info("Submission removed");	
-          show_my_ids();
-        } else {
-          add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
-          show_info("Feedback submitted, thanks!");	
-				  remove_elem_by_id(resp.id);
-        }
-      }
-    };
-
-    xhr.onreadystatechange = function() {
-			if (xhr.readyState === 4){   //if complete
-        	if(xhr.status === 200){  //check if "OK" (200)
-            //success
-        	} else {
-						remove_class(el, "spinner");
-      			show_error("Error sending request.");	
-        	}
-			}
-    };
-
-		xhr.send(JSON.stringify(data));
-    add_class(el, "spinner");
-  };
-
+  }; 
 
   var create_comment = function(item) {
     var div_c = document.createElement('div');
-    div_c.setAttribute("class", "comment");
+    div_c.setAttribute("class", "comment animated bounceIn");
 
     var div_cc = document.createElement('div');
     div_cc.setAttribute("class", "comment-content");
@@ -489,14 +436,14 @@
     var item, div, comment, ydiv,
         local_my_ids;
     local_my_ids = get_array_from_storage(MY_ID_STORAGE);
-    ydiv = document.getElementById('your-submissions');
+    ydiv = document.getElementById('my-submissions');
     if (local_my_ids.length === 0) {
       ydiv.style.display = 'none';
     } else {   
       ydiv.style.display = '';
     }
 
-    div = document.getElementById('your-comments');
+    div = document.getElementById('my-comments');
     div.innerHTML = "";
     local_my_ids.reverse().forEach( function(id) {
       item = JSON.parse(localStorage.getItem(id));
@@ -506,6 +453,58 @@
       add_emoji_style(item);
     });
   };
+
+
+  var post_update = function(el, id, action) {
+    var resp,
+        xhr = create_cors_request("POST", UPDATE_URL),
+        data = {}, elem, item;
+
+    data = {
+      "id": id,
+      "action": action
+    };
+
+    item = JSON.parse(localStorage.getItem(id));
+    if (item === null) {
+      data.key = "";
+    } else {
+      data.key = item.key;
+    }
+
+    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+    xhr.onload = function() {
+			remove_class(el, "spinner");
+      if (xhr.status !== 200) {
+        fade_in_out(xhr.responseText, "flash-error");
+      } else {
+        resp = JSON.parse(xhr.responseText);
+        if (action === 'cancel') {
+          remove_id_from_storage(resp.id, MY_ID_STORAGE, null);
+          fade_in_out("Submission removed", "flash-info");	
+          show_my_ids();
+        } else {
+          add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
+          fade_in_out("Feedback submitted, thanks!", "flash-info");	
+          elem = document.getElementById(resp.id).parentNode;
+          fade_out_delete(elem, update_pending_divider);
+        }
+      }
+    };
+
+    xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {   //if complete
+        if(xhr.status !== 200) {  //check if "OK" (200)
+          remove_class(el, "spinner");
+          fade_in_out("Error sending request.", "flash-error");	
+        }
+			}
+    };
+
+		xhr.send(JSON.stringify(data));
+    add_class(el, "spinner");
+  };
+
 
 /*
   var check_pending = function(callback) {
@@ -533,8 +532,9 @@
     disable_all_input(true);
     var i, input, resp,
         ii = form.length,
-        xhr = create_cors_request("POST", form.action);
+        xhr = create_cors_request("POST", form.action),
         data = {};
+
     for (i = 0; i < ii; ++i) {
       input = form[i];
       if (input.name) {
@@ -552,9 +552,9 @@
     xhr.onload = function() {
       disable_all_input(false);
       if (xhr.status !== 200) {
-        show_error(xhr.responseText);	
+        fade_in_out(xhr.responseText, "flash-error");	
       } else {
-        show_submitted("Submitted! Your submission will be pending until it is approved by another person viewing the site.");
+        fade_in_out("Submitted! Your submission will be pending until it is approved by another person viewing the site.", "flash-info");
         resp = JSON.parse(xhr.responseText);
         localStorage.setItem(resp.id, JSON.stringify(resp));
         add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
@@ -562,13 +562,11 @@
       }
     };
     xhr.onreadystatechange = function() {
-			if (xhr.readyState === 4){   //if complete
-        	if(xhr.status === 200){  //check if "OK" (200)
-            //success
-        	} else {
-      			show_error("Error sending review request.");	
-      			disable_all_input(false);
-        	}
+			if (xhr.readyState === 4) {   //if complete
+        if (xhr.status !== 200) {  //check if "OK" (200)
+          fade_in_out("Error sending review request.", "flash-error");	
+          disable_all_input(false);
+        }
 			}
     };
 
@@ -583,8 +581,9 @@
   };
 
 
-  var review_all = function(el) {
-    var total = 0;
+  var review_all = function() {
+    var total = 0, rem_wrap, f_el, remaining,
+        rem_el;
     rem_wrap = document.getElementById("num-remaining-wrap");
     FORM_IDS.forEach(function(id) {
       f_el = document.getElementById(id);
@@ -602,6 +601,7 @@
   };
 
   var review_textinput = function(el) {
+    var span_el;
 		span_el = document.getElementById(el.id.replace('input', 'span'));
 
     if (el.value.length > MAX_LENGTHS[el.id]) {
@@ -618,36 +618,9 @@
     }
   };
 
-  var clear_input_fields = function() {
-    FORM_IDS.forEach(function(entry) {
-      if (entry == "input-button") {
-        return;
-      }
-      f_el = document.getElementById(entry); 
-      f_el.value = "";
-		  span_el = document.getElementById(entry.replace('input', 'span'));
-      if (span_el !== null) {
-        remove_class(span_el, "valid");
-      }
-    });
-  };
-
-	var disable_all_input = function(value) {
-    FORM_IDS.forEach(function(entry) {
-     el = document.getElementById(entry); 
-     if (value) {
-      add_class(el, "tint");
-     } else {
-      remove_class(el, "tint");
-     }
-     el.disabled = value;
-    });
-    e = document.getElementsByName("emoji");
-    e.forEach(function(elem) { elem.disabled = value; });
-  };
-
   var add_event_listeners = function() {
- 		var sub_el, review_el;
+ 		var sub_el, review_el,
+        company_el, position_el, location_el;
     review_el = document.getElementById("input-review"); 
     company_el = document.getElementById("input-company"); 
     position_el = document.getElementById("input-position"); 
@@ -659,7 +632,7 @@
     add_event_listener("input", position_el, function() { review_textinput(position_el); });
     add_event_listener("input", location_el, function() { review_textinput(location_el); });
     add_event_listener("input", sub_el, function() { review_all(sub_el); });
-    document.addEventListener("touchstart", function(){}, true);
+    // document.addEventListener("touchstart", function(){undefined;}, true);
 
   };
 
@@ -685,25 +658,23 @@
           add_reviews(_.sample(data, 2), 'pending-comments');
         }
       } else {
-        show_error("Unable to get pending reviews");
+        fade_in_out("Unable to get pending reviews", "flash-error");
       }
     };
     request.onreadystatechange = function() {
       if (request.readyState === 4){   //if complete
-          if(request.status === 200){  //check if "OK" (200)
-            //success
-          } else {
-            show_error("Error fetching pending reviews");	
+          if(request.status !== 200) {  //check if "OK" (200)
+            fade_in_out("Error fetching pending reviews", "flash-error");	
           }
       }
     };
     request.onerror = function() {
       // There was a connection error of some sort
-      show_error("Error sending review request.");	
+      fade_in_out("Error sending review request.", "flash-error");	
     };
 
     request.send();
-  }
+  };
 
   var show_reviews = function() {
     var request = create_cors_request("GET", "/reviews/reviews.json");
@@ -712,25 +683,23 @@
         var data = JSON.parse(request.responseText);
         add_reviews(data, 'comments');
       } else {
-        show_error("Unable to get reviews");
+        fade_in_out("Unable to get reviews", "flash-error");
       }
     };
     request.onreadystatechange = function() {
-      if (request.readyState === 4){   //if complete
-          if(request.status === 200){  //check if "OK" (200)
-            //success
-          } else {
-            show_error("Error fetching reviews");	
+      if (request.readyState === 4) {   //if complete
+          if(request.status !== 200) {  //check if "OK" (200)
+            fade_in_out("Error fetching reviews", "flash-error");	
           }
       }
     };
     request.onerror = function() {
       // There was a connection error of some sort
-      show_error("Error sending review request.");	
+      fade_in_out("Error sending review request.", "flash-error");	
     };
 
     request.send();
-  }
+  };
   // ----------------
 
   add_event_listeners();
