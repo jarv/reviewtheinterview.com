@@ -8,8 +8,8 @@
 
 (function() {
   // functions
-
-
+  //
+  //
   var add_class,
       add_emoji_style,
       add_event_listener,
@@ -18,6 +18,7 @@
       add_reviews,
       ajax_submit,
       autocompletion,
+      check_pending,
       clear_input_fields,
       create_comment,
       create_cors_request,
@@ -66,7 +67,7 @@
   pad = function(num, size) {
       var s = "0000" + num;
       return s.substr(s.length-size);
-  };
+  }
 
   time_convert = function(t) {     
     var a = new Date(t * 10),
@@ -88,7 +89,7 @@
       return date + ' ' + month + ', ' + pad(hour, 2) + ':' + pad(min, 2);
     }
     return date + ' ' + month + ' ' + year + ', ' + pad(hour, 2) + ':' + pad(min, 2);
-  };
+  }
 
   add_event_listener = function(event, obj, fn) {
     if (obj.addEventListener) {
@@ -96,7 +97,7 @@
     } else {
       obj.attachEvent("on"+event, fn); // old ie
     }
-  };
+  }
 
   add_class = function(el, class_name) {
     if (el.classList) {
@@ -104,7 +105,7 @@
     } else {
       el.class_name += ' ' + class_name;
     }
-  };
+  }
 
   remove_class = function(el, class_name) {
     if (el.classList) {
@@ -112,14 +113,14 @@
     } else {
       el.class_name = el.class_name.replace(new RegExp('(^|\\b)' + class_name.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
     }
-  };
+  }
 
   fade_in_add = function(el, to_add, callback) {
     console.log("fade in add ");
     el.appendChild(to_add);
     add_class(to_add, "fadeInDown");  
     if (typeof callback === 'function') { callback(); }
-  };
+  }
 
   fade_out_delete = function(el, callback) {
     console.log("fade out del");
@@ -128,8 +129,8 @@
       el.parentNode.removeChild(el);
       remove_class(el, "fadeOut");
       if (typeof callback === 'function') { callback(); }
-    }, 500);
-  };
+    }, 1500);
+  }
 
   create_cors_request = function(method, url) {
     var xhr = new XMLHttpRequest();
@@ -153,7 +154,7 @@
 
     }
     return xhr;
-  };
+  }
 
   var major_company_list = [
     "Apple Inc.",
@@ -327,7 +328,7 @@
         remove_class(span_el, "valid");
       }
     });
-  };
+  }
 
 
   disable_all_input = function(value) {
@@ -343,7 +344,7 @@
     });
     e = document.getElementsByName("emoji");
     e.forEach(function(elem) { elem.disabled = value; });
-  };
+  }
 
   fade_in_out = function(msg, id) {
     console.log("fade in out");
@@ -357,7 +358,7 @@
         fade_out_delete(to_add);
       }, 2000);
     });
-  };
+  }
 
   get_array_from_storage = function(storage_name) {
     var ids;
@@ -370,7 +371,7 @@
      ids = [];
     }
     return ids;
-  };
+  }
 
   remove_id_from_storage = function(id, storage_name, callback) {
     var local_ids, json_ids;
@@ -380,7 +381,7 @@
     if (typeof callback === 'function') {
       callback();
     }
-  };
+  }
 
   add_id_to_storage = function(id, storage_name, callback) {
     var local_ids, json_ids;
@@ -392,7 +393,7 @@
     if (typeof callback === 'function') {
       callback();
     }
-  };
+  }
 
   update_pending_divider = function() {
     var pdiv = document.getElementById('pending-submissions'),
@@ -402,7 +403,7 @@
     } else {   
       pdiv.style.display = '';
     }
-  };
+  }
 
   show_my_ids = function() {
     var item, div, comment, ydiv,
@@ -424,7 +425,7 @@
       div.appendChild(comment);
       add_emoji_style(item);
     });
-  };
+  }
 
 
   post_update = function(el, id, action) {
@@ -475,7 +476,7 @@
 
     xhr.send(JSON.stringify(data));
     add_class(el, "spinner");
-  };
+  }
 
 
   create_comment = function(item) {
@@ -530,7 +531,7 @@
     div_c.appendChild(div_cc);
 
     return div_c;
-  };
+  }
 
   add_emoji_style = function(item) {
     var css = '#' + item.id + ':before' + '{ background-image: url("/img/' + item.emoji.replace(/^e/, '') + '.png"); }',
@@ -544,7 +545,19 @@
       style.appendChild(document.createTextNode(css));
     }
     head.appendChild(style);
+  }
+
+
+
+
+/*
+  check_pending = function(callback) {
+    if (typeof callback === 'function') {
+      callback();
+    }
   };
+*/
+
 
   add_reviews = function(data, wrapper_id) {
     var comment,
@@ -557,7 +570,7 @@
       div.appendChild(comment);
       add_emoji_style(item);
     });
-  };
+  }
 
   ajax_submit = function(form) {
     disable_all_input(true);
@@ -602,14 +615,14 @@
     };
 
     xhr.send(JSON.stringify(data));
-  };
+  }
 
   submit_review = function(e) {
     var submit_form;
     e.preventDefault();
     submit_form = document.getElementById("review-submit");
     ajax_submit(submit_form);
-  };
+  }
 
 
   review_all = function() {
@@ -629,7 +642,7 @@
       rem_el.innerHTML = "0";
       add_class(rem_wrap, "red-border");
     }
-  };
+  }
 
   review_textinput = function(el) {
     var span_el;
@@ -647,7 +660,7 @@
     } else {
       remove_class(span_el, "valid");
     }
-  };
+  }
 
   add_event_listeners = function() {
      var sub_el, review_el,
@@ -665,14 +678,14 @@
     add_event_listener("input", sub_el, function() { review_all(sub_el); });
     // document.addEventListener("touchstart", function(){undefined;}, true);
 
-  };
+  }
 
   autocompletion = function() {
     var complete_company = new Awesomplete(document.getElementById("input-company"));
     complete_company.list = major_company_list;
     var complete_location = new Awesomplete(document.getElementById("input-location"));
     complete_location.list = all_cities;
-  };
+  }
 
 
   show_pending_reviews = function() {
@@ -705,7 +718,7 @@
     };
 
     request.send();
-  };
+  }
 
   show_reviews = function() {
     var request = create_cors_request("GET", "/reviews/reviews.json");
@@ -730,7 +743,7 @@
     };
 
     request.send();
-  };
+  }
   // ----------------
 
   add_event_listeners();

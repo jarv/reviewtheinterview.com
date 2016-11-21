@@ -345,18 +345,17 @@ h3 {
 
 $base-spacing: 1.5em !default;
 
-#flash-error {
+.flash-error {
   background-color: lighten(#ff0000, 10%);
   color: white;
 }
 
-#flash-info {
+.flash-info {
   background-color: darken($dkblue, 10%);
   color: white;
 }
 
 .flash {
-  display: none;
   margin-bottom: $base-spacing / 2;
   padding: $base-spacing / 2;
   text-align: center;
