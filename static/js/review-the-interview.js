@@ -14,7 +14,18 @@
   var FORM_IDS = ['input-review', 'input-company',
                   'input-position', 'input-location', 'input-button'];
 
-	var MIN_LENGTHS = {
+  // functions
+  //
+	
+	var add_class, add_emoji_style, add_event_listeners, add_id_to_storage,
+			add_reviews, ajax_submit, autocompletion, check_pending,
+			clear_input_fields, create_comment, fade_in_add, fade_in_out,
+			fade_out_delete, get_array_from_storage, post_update, remove_id_from_storage,
+			review_all, review_textinput, show_my_ids, show_pending_reviews,
+			show_reviews, update_pending_divider;
+
+
+  var MIN_LENGTHS = {
     'input-company': 3,
     'input-location': 5,
     'input-position': 3,
