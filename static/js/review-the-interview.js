@@ -37,7 +37,8 @@
       show_reviews,
       submit_review,
       time_convert,
-      update_pending_divider;
+      update_pending_divider,
+			validate_all_input;
 
   var UPDATE_URL = "https://3x1gqtafv9.execute-api.us-east-1.amazonaws.com/prod/update";
   var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
@@ -57,7 +58,7 @@
   var MAX_LENGTHS = {
     'input-company':  30,
     'input-location': 50,
-    'input-position': 50,
+    'input-position': 40,
     'input-review': 140
   };
 
@@ -115,14 +116,12 @@
   };
 
   fade_in_add = function(el, to_add, callback) {
-    console.log("fade in add ");
     el.appendChild(to_add);
     add_class(to_add, "fadeInDown");  
     if (typeof callback === 'function') { callback(); }
   };
 
   fade_out_delete = function(el, callback) {
-    console.log("fade out del");
     add_class(el, "fadeOut");  
     setTimeout(function() {
       el.parentNode.removeChild(el);
@@ -154,6 +153,34 @@
     }
     return xhr;
   };
+
+	var major_positions = [
+		"Software Engineer",
+		"Senior Software Engineer",
+		"Application analyst",
+		"Computer Scientist",
+		"Computer Analyst",
+		"Database Administrator",
+		"Data Analyst",
+		"Data Scientist",
+		"Network Analyst",
+		"Network Administrator",
+		"Programmer",
+		"Security Engineer",
+		"Software Design",
+		"Software Architect",
+		"Senior Software Architect",
+		"Software Analyst",
+		"Software Quality Analyst",
+		"Software Quality Analyst",
+		"System Administrator",
+		"Web Developer",
+		"Engineer",
+		"System Reliability Engineer",
+		"Senior System Reliability Engineer",
+		"Front-end Developer"
+	];
+
 
   var major_company_list = [
     "Apple Inc.",
@@ -256,7 +283,8 @@
     "Brno, Czech Republic",
     "Bochum, Germany",
     "Cardiff, United Kingdom",
-    "Bydgoszcz, Poland"
+    "Bydgoszcz, Poland",
+		"Ljubljana, Slovenia"
   ];
 
   var major_us_cities = [
@@ -315,7 +343,10 @@
   var all_cities = major_us_cities.concat(major_european_cities);
 
   clear_input_fields = function() {
-    var f_el, span_el;
+    var f_el, span_el, rem_el;
+    rem_el = document.getElementById("num-remaining");
+		rem_el.innerHTML = '140';
+
     FORM_IDS.forEach(function(entry) {
       if (entry === "input-button") {
         return;
@@ -346,7 +377,6 @@
   };
 
   fade_in_out = function(msg, id) {
-    console.log("fade in out");
     var el, to_add;
     el = document.getElementById("flash-wrapper");
     to_add = document.createElement('div');
@@ -560,13 +590,37 @@
     if (typeof callback === 'function') { callback(); }
   };
 
+	validate_all_input = function() {
+		var review_el, company_el, position_el,
+				location_el, validate_msg, sub_el;
+
+    review_el = document.getElementById("input-review"); 
+    company_el = document.getElementById("input-company"); 
+    position_el = document.getElementById("input-position"); 
+    location_el = document.getElementById("input-location"); 
+    sub_el = document.getElementById("review-submit");
+
+    validate_msg = [review_textinput(review_el),
+										review_textinput(company_el),
+										review_textinput(position_el),
+										review_textinput(location_el),
+                    review_all(sub_el)];
+		return(_.compact(validate_msg));
+	};
+
   ajax_submit = function(form) {
-    disable_all_input(true);
     var i, input, resp,
         ii = form.length,
         xhr = create_cors_request("POST", form.action),
-        data = {};
+        data = {}, validate_arr;
 
+		validate_arr = validate_all_input();
+		if (validate_arr.length > 0) {
+      fade_in_out(validate_arr.join('<br />'), "flash-info");
+      return;
+		}
+
+    disable_all_input(true);
     for (i = 0; i < ii; ++i) {
       input = form[i];
       if (input.name) {
@@ -615,7 +669,7 @@
 
   review_all = function() {
     var total = 0, rem_wrap, f_el, remaining,
-        rem_el;
+        rem_el, msg = null;
     rem_wrap = document.getElementById("num-remaining-wrap");
     FORM_IDS.forEach(function(id) {
       f_el = document.getElementById(id);
@@ -629,41 +683,54 @@
     } else {
       rem_el.innerHTML = "0";
       add_class(rem_wrap, "red-border");
+      msg = "Submission is too long";
     }
+    return msg;
   };
 
   review_textinput = function(el) {
-    var span_el;
+    var span_el, msg = null,
+				disp_name = el.id.replace("input-", "").charAt(0).toUpperCase() + el.id.replace("input-", "").slice(1);
     span_el = document.getElementById(el.id.replace('input', 'span'));
 
     if (el.value.length > MAX_LENGTHS[el.id]) {
       add_class(el, "overflow");
       remove_class(span_el, "valid");
+			msg = disp_name + " is too long.";
     } else {
       remove_class(el, "overflow");
     }
 
+    if (el.value.length < MIN_LENGTHS[el.id]) {
+			msg = disp_name + " is too short.";
+		}
     if (el.value.length <= MAX_LENGTHS[el.id] && el.value.length >= MIN_LENGTHS[el.id]) {
       add_class(span_el, "valid");
     } else {
       remove_class(span_el, "valid");
     }
+    return msg;
   };
 
   add_event_listeners = function() {
      var sub_el, review_el,
-        company_el, position_el, location_el;
+        company_el, position_el, location_el, clear_el;
     review_el = document.getElementById("input-review"); 
     company_el = document.getElementById("input-company"); 
     position_el = document.getElementById("input-position"); 
     location_el = document.getElementById("input-location"); 
     sub_el = document.getElementById("review-submit");
+    clear_el = document.getElementById("clear-local-storage");
     add_event_listener("submit", sub_el, submit_review);
     add_event_listener("input", review_el, function() { review_textinput(review_el); });
     add_event_listener("input", company_el, function() { review_textinput(company_el); });
     add_event_listener("input", position_el, function() { review_textinput(position_el); });
     add_event_listener("input", location_el, function() { review_textinput(location_el); });
     add_event_listener("input", sub_el, function() { review_all(sub_el); });
+    add_event_listener("awesomplete-selectcomplete", location_el, function() { review_textinput(location_el); });
+    add_event_listener("awesomplete-selectcomplete", company_el, function() { review_textinput(company_el); });
+    add_event_listener("awesomplete-selectcomplete", position_el, function() { review_textinput(position_el); });
+    add_event_listener("click", clear_el, function(e) { e.preventDefault(); localStorage.clear(); fade_in_out("All local state removed, refresh page to see update", "flash-info"); });
     // document.addEventListener("touchstart", function(){undefined;}, true);
 
   };
@@ -673,6 +740,8 @@
     complete_company.list = major_company_list;
     var complete_location = new Awesomplete(document.getElementById("input-location"));
     complete_location.list = all_cities;
+    var complete_positions = new Awesomplete(document.getElementById("input-position"));
+		complete_positions.list = major_positions;
   };
 
 

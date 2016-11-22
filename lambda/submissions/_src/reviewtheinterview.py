@@ -5,10 +5,17 @@ import boto3
 import uuid
 import re
 import time
-
+import cgi
 
 class ValidationError(Exception):
     pass
+
+class actions:
+    love = "love"
+    poo = "poo"
+    approve = "approve"
+    reject = "reject"
+    cancel = "cancel"
 
 
 class submit:
@@ -21,10 +28,10 @@ class submit:
 
 class max_lengths:
     company = 30
-    emoji = 10
     location = 50
-    position = 50
+    position = 40
     review = 140
+    emoji = 10
 
 
 class min_lengths:
@@ -41,8 +48,14 @@ SUBMIT_FIELDS = set([submit.company,
                      submit.review,
                      ])
 
+ACTION_FIELDS = set([actions.love,
+                     actions.poo,
+                     actions.approve,
+                     actions.reject,
+                     actions.cancel])
+
+
 OVERALL_LENGTH = 140
-REGEX_MATCH = "^[A-Za-z\s0-9!:$@#%^&*(),]+$"
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
@@ -91,9 +104,7 @@ def validated_body(body):
             raise ValidationError("{} field must be less than {}.".format(value, getattr(max_lengths, value)))
         if len(body[value]) < getattr(min_lengths, value):
             raise ValidationError("{} field must be greater than {}.".format(value, getattr(min_lengths, value)))
-        if not re.match(REGEX_MATCH, body[value]):
-            raise ValidationError("{} has invalid characters.".format(value))
-    return {k: body[k] for k in SUBMIT_FIELDS}
+    return {k: cgi.escape(body[k]) for k in SUBMIT_FIELDS}
 
 
 def handler(event, context):
@@ -139,6 +150,7 @@ def handler(event, context):
     ret_body['update_time'] = t
     try:
         item = merge_two_dicts(ret_body, req_fields)
+        item.update({ k: 0 for k in ACTION_FIELDS})
         put = dynamo.put_item(Item=item)
     except Exception as e:
         LOG.exception("Error adding entry to the database: {}".format(item))
