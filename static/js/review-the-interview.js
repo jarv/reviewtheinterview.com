@@ -580,6 +580,11 @@
     var comment,
         div = document.getElementById(wrapper_id);
     data.forEach( function(item) {
+      // remove from my submission list if it is now pending or approved
+      if (_.contains(get_array_from_storage(MY_ID_STORAGE), item.id)) {
+        remove_id_from_storage(item.id, MY_ID_STORAGE, null);
+        show_my_ids();
+      }
       if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
         return;
       }
