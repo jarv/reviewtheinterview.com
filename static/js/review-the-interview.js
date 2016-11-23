@@ -16,6 +16,7 @@
       add_event_listeners,
       add_id_to_storage,
       add_reviews,
+      add_tooltip,
       ajax_submit,
       autocompletion,
       clear_input_fields,
@@ -507,6 +508,13 @@
     add_class(el, "spinner");
   };
 
+  add_tooltip = function(el, msg) {
+    var t = document.createElement('div'); t.setAttribute("class", "tooltip");
+    var tc = document.createElement('div'); tc.setAttribute("class", "tooltip-content");
+    tc.innerHTML = msg;  
+    t.appendChild(tc);
+    el.appendChild(t);
+  };
 
   create_comment = function(item, type) {
     var div_c = document.createElement('div');
@@ -536,17 +544,22 @@
     // 274c cancel
     if (type === "your-comments") {
       var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel");
+      add_tooltip(b1, "Delete");
       b.appendChild(b1);
       add_event_listener("click", b1, function() { post_update(b1, item.id, 'cancel');   });
     } else if (type === "pending-comments") {
       var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve");
+      add_tooltip(b2, "Approve!");
       var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject");
+      add_tooltip(b3, "Reject!");
       b.appendChild(b2); b.appendChild(b3);
       add_event_listener("click", b2, function() { post_update(b2, item.id, 'approve'); });
       add_event_listener("click", b3, function() { post_update(b3, item.id, 'reject'); });
     } else { // type === comments
       var b4 = document.createElement('div'); b4.setAttribute("class", "rating love");
+      add_tooltip(b4, "Love it!");
       var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo");
+      add_tooltip(b5, "Poo poo!");
       b.appendChild(b4); b.appendChild(b5);
       add_event_listener("click", b4, function() { post_update(b4, item.id, 'love'); });
       add_event_listener("click", b5, function() { post_update(b5, item.id, 'poo'); });
