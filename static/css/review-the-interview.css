@@ -195,12 +195,14 @@ hr {
   /* For some Androids */ }
 
 body {
-  background-color: #252839; }
+  background-color: #232636; }
 
 .wrapper {
   max-width: 1200px;
   margin-left: auto;
-  margin-right: auto; }
+  margin-right: auto;
+  background-color: #252839;
+  padding: 10px; }
   .wrapper::after {
     clear: both;
     content: "";
@@ -287,7 +289,7 @@ h3 {
   text-align: center;
   color: #fae1aa;
   width: 100%;
-  background-color: #212433;
+  background-color: #232636;
   padding: 5px;
   border: 2px solid #252839; }
 
@@ -478,7 +480,10 @@ h3 {
     transition: all .1s ease-in-out; }
     .emoji-comment-selector .rating:focus, .emoji-comment-selector .rating:hover {
       transform: scale(1.1); }
-    .emoji-comment-selector .rating:focus .tooltip, .emoji-comment-selector .rating:hover .tooltip {
+    .emoji-comment-selector .rating:not(.no-hover):hover .tooltip {
+      -webkit-transition-delay: 500ms;
+      -moz-transition-delay: 500ms;
+      transition-delay: 500ms;
       opacity: 1;
       visibility: visible;
       transform: scale(1); }
@@ -584,33 +589,7 @@ span.valid:after {
   content: "\2713";
   color: green; }
 
-.tooltip-item {
-  position: relative; }
-  .tooltip-item:focus .tooltip, .tooltip-item:hover .tooltip {
-    opacity: 1;
-    visibility: visible; }
-  .tooltip-item .tooltip {
-    position: absolute;
-    right: 0;
-    bottom: 3em;
-    left: 0;
-    background-color: #f5f5f5;
-    margin-left: -2em;
-    opacity: 0;
-    text-align: center;
-    visibility: hidden;
-    width: 12em;
-    z-index: 10; }
-  .tooltip-item .tooltip::after {
-    position: absolute;
-    right: 0;
-    left: 0;
-    bottom: -1em;
-    color: #f5f5f5;
-    content: "▼";
-    font-size: 1.4em;
-    text-align: center; }
-  .tooltip-item .tooltip-content {
-    margin-bottom: 0; }
+footer {
+  width: 100%; }
 
 /*# sourceMappingURL=review-the-interview.css.map */

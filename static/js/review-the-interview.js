@@ -462,6 +462,10 @@
     var resp,
         xhr = create_cors_request("POST", UPDATE_URL),
         data = {}, elem, item;
+    add_class(el, "no-hover");
+    tooltip_el=(el.firstElementChild||el.firstChild);
+    console.log(tooltip_el);
+
 
     data = {
       "id": id,
@@ -478,6 +482,7 @@
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
       remove_class(el, "spinner");
+      remove_class(el, "no-hover");
       if (xhr.status !== 200) {
         fade_in_out(xhr.responseText, "flash-error");
       } else {
@@ -499,6 +504,7 @@
       if (xhr.readyState === 4) {   //if complete
         if(xhr.status !== 200) {  //check if "OK" (200)
           remove_class(el, "spinner");
+          remove_class(el, "no-hover");
           fade_in_out("Error sending request.", "flash-error");  
         }
       }
