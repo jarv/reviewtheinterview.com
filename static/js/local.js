@@ -7,8 +7,6 @@
 /*global _: false*/
 
 (function() {
-  // functions
-
 
   var add_class,
       add_emoji_style,
@@ -357,6 +355,8 @@
       span_el = document.getElementById(entry.replace('input', 'span'));
       if (span_el !== null) {
         remove_class(span_el, "valid");
+        remove_class(span_el, "fa");
+        remove_class(span_el, "fa-check-circle");
       }
     });
   };
@@ -408,6 +408,7 @@
     local_ids = get_array_from_storage(storage_name);
     json_ids = JSON.stringify(_.without(local_ids,id));
     localStorage.setItem(storage_name, json_ids);
+    localStorage.removeItem(id);
     if (typeof callback === 'function') {
       callback();
     }
@@ -463,15 +464,22 @@
         xhr = create_cors_request("POST", UPDATE_URL),
         data = {}, elem, item;
     add_class(el, "no-hover");
-    tooltip_el=(el.firstElementChild||el.firstChild);
-    console.log(tooltip_el);
 
+    if (action === 'cancel') {
+      remove_id_from_storage(id, MY_ID_STORAGE, null);
+      fade_in_out("Submission no longer displayed and removed from browser storage.", "flash-info");  
+      add_class(el.parentNode.parentNode, "animated");
+      add_class(el.parentNode.parentNode, "fadeOut");
+      setTimeout(show_my_ids, 1000);
+      return;
+    } 
 
     data = {
       "id": id,
       "action": action
     };
 
+    // Not currently used but could be used to let the user delete users
     item = JSON.parse(localStorage.getItem(id));
     if (item === null) {
       data.key = "";
@@ -514,8 +522,8 @@
     add_class(el, "spinner");
   };
 
-  add_tooltip = function(el, msg) {
-    var t = document.createElement('div'); t.setAttribute("class", "tooltip");
+  add_tooltip = function(el, msg, type) {
+    var t = document.createElement('div'); t.setAttribute("class", "tooltip " + type);
     var tc = document.createElement('div'); tc.setAttribute("class", "tooltip-content");
     tc.innerHTML = msg;  
     t.appendChild(tc);
@@ -536,9 +544,9 @@
     var p_review = document.createElement('p');
     p_review.innerHTML = item.review;
 
-    var p_created = document.createElement('p');
-    p_created.setAttribute("class", "comment-detail");
-    p_created.innerHTML = time_convert(item.create_time);
+    var div_detail = document.createElement('div');
+    div_detail.setAttribute("class", "comment-detail");
+    div_detail.innerHTML = '<span class="date">' + time_convert(item.create_time) + '</span><span class="location">Location: ' + item.location + '</span>';
 
     var b = document.createElement('div');
     b.setAttribute("class", "emoji-comment-selector");
@@ -549,23 +557,26 @@
     // 2705 check2
     // 274c cancel
     if (type === "your-comments") {
-      var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel");
-      add_tooltip(b1, "Delete");
+      var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel rating-small");
+      add_tooltip(b1, "Remove", "small");
       b.appendChild(b1);
       add_event_listener("click", b1, function() { post_update(b1, item.id, 'cancel');   });
+      add_class(div_cc, "blue-border");
+
     } else if (type === "pending-comments") {
-      var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve");
-      add_tooltip(b2, "Approve!");
-      var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject");
-      add_tooltip(b3, "Reject!");
+      var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve rating-big");
+      add_tooltip(b2, "Approve!", "large");
+      var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject rating-big");
+      add_tooltip(b3, "Reject!", "large");
       b.appendChild(b2); b.appendChild(b3);
       add_event_listener("click", b2, function() { post_update(b2, item.id, 'approve'); });
       add_event_listener("click", b3, function() { post_update(b3, item.id, 'reject'); });
+      add_class(div_cc, "yellow-border");
     } else { // type === comments
-      var b4 = document.createElement('div'); b4.setAttribute("class", "rating love");
-      add_tooltip(b4, "Love it!");
-      var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo");
-      add_tooltip(b5, "Poo poo!");
+      var b4 = document.createElement('div'); b4.setAttribute("class", "rating love rating-big");
+      add_tooltip(b4, "Love it!", "large");
+      var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo rating-big");
+      add_tooltip(b5, "Poo poo!", "large");
       b.appendChild(b4); b.appendChild(b5);
       add_event_listener("click", b4, function() { post_update(b4, item.id, 'love'); });
       add_event_listener("click", b5, function() { post_update(b5, item.id, 'poo'); });
@@ -575,7 +586,7 @@
 
     div_cc.appendChild(h_comp_pos);
     div_cc.appendChild(p_review);
-    div_cc.appendChild(p_created);
+    div_cc.appendChild(div_detail);
     div_c.appendChild(div_cc);
 
     return div_c;
@@ -599,10 +610,9 @@
     var comment,
         div = document.getElementById(wrapper_id);
     data.forEach( function(item) {
-      // remove from my submission list if it is now pending or approved
+      // skip if it is your submission
       if (_.contains(get_array_from_storage(MY_ID_STORAGE), item.id)) {
-        remove_id_from_storage(item.id, MY_ID_STORAGE, null);
-        show_my_ids();
+        return;
       }
       if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
         return;
@@ -692,13 +702,14 @@
 
 
   review_all = function() {
-    var total = 0, rem_wrap, f_el, remaining,
+    var total = 0, rem_wrap, remaining,
         rem_el, msg = null;
     rem_wrap = document.getElementById("num-remaining-wrap");
-    FORM_IDS.forEach(function(id) {
-      f_el = document.getElementById(id);
-      total = total + f_el.value.length;
-    });
+    total = total + document.getElementById("input-review").value.length;
+    // FORM_IDS.forEach(function(id) {
+    //   f_el = document.getElementById(id);
+    //   total = total + f_el.value.length;
+    // });
     remaining = OVERALL_LENGTH - total;
     rem_el = document.getElementById("num-remaining");
     if (remaining > 0) {
@@ -720,6 +731,8 @@
     if (el.value.length > MAX_LENGTHS[el.id]) {
       add_class(el, "overflow");
       remove_class(span_el, "valid");
+      remove_class(span_el, "fa");
+      remove_class(span_el, "fa-check-circle");
 			msg = disp_name + " is too long.";
     } else {
       remove_class(el, "overflow");
@@ -730,8 +743,12 @@
 		}
     if (el.value.length <= MAX_LENGTHS[el.id] && el.value.length >= MIN_LENGTHS[el.id]) {
       add_class(span_el, "valid");
+      add_class(span_el, "fa");
+      add_class(span_el, "fa-check-circle");
     } else {
       remove_class(span_el, "valid");
+      remove_class(span_el, "fa");
+      remove_class(span_el, "fa-check-circle");
     }
     return msg;
   };

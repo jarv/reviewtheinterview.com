@@ -5,76 +5,15 @@ import boto3
 import re
 import time
 import decimal
+from common.dynamo import update, actions, max_lengths, regex_matches, UPDATE_FIELDS, ACTION_FIELDS, ValidationError, UPDATES_TABLE_NAME, SUBMISSIONS_TABLE_NAME, raise_on_rate_limit
+from common. helpers import default_resp, merge_two_dicts
 
 # b = boto3.session.Session(profile_name='reviewtheinterview', region_name='us-east-1')
 # s = b.resource('dynamodb').Table("reviewtheinterview-submissions")
 
 
-class ValidationError(Exception):
-    pass
-
-
-class update:
-    id = "id"
-    action = "action"
-    key = "key"
-
-
-class actions:
-    love = "love"
-    poo = "poo"
-    approve = "approve"
-    reject = "reject"
-    cancel = "cancel"
-
-
-class max_lengths:
-    id = 38
-    action = 100
-    key = 39
-
-
-class regex_matches:
-    id = '^[\w_-]+$'
-    action = '^[\w_-]+$'
-    key = '.*'
-
-UPDATE_FIELDS = set([update.id,
-                     update.action,
-                     update.key,
-                     ])
-
-ACTION_FIELDS = set([actions.love,
-                     actions.poo,
-                     actions.approve,
-                     actions.reject,
-                     actions.cancel])
-
-
 LOG = logging.getLogger()
-LOG.setLevel(logging.DEBUG)
-UPDATES_TABLE_NAME = 'reviewtheinterview-updates'
-SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
-
-
-def merge_two_dicts(x, y):
-    '''Given two dicts, merge them into a new dict as a shallow copy.'''
-    z = x.copy()
-    z.update(y)
-    return z
-
-
-def respond(err, res=None):
-    if err:
-        LOG.warn(str(err.message))
-    return {
-        'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': "*"
-        },
-    }
+LOG.setLevel(logging.WARN)
 
 
 def validated_body(body):
@@ -144,21 +83,21 @@ def delete_item(key_id):
 
 def handler(event, context):
     if 'body' not in event:
-        return respond(ValidationError("Missing body."))
+        return default_resp(ValidationError("Missing body."))
 
     try:
         body_from_json = json.loads(event['body'])
     except (ValueError, TypeError) as e:
         LOG.exception("Unable to parse body: {}".format(e.message))
-        return respond(ValidationError("Unable to parse request"))
+        return default_resp(ValidationError("Unable to parse request"))
 
     try:
         ret_body = validated_body(body_from_json)
     except ValidationError, e:
-        return respond(e)
+        return default_resp(e)
 
     if not ret_body:
-        return respond(ValueError('Validation error - empty body'))
+        return default_resp(ValueError('Validation error - empty body'))
 
     req_fields = {}
 
@@ -166,13 +105,18 @@ def handler(event, context):
         # Add additional fields for http requests
         operation = event['httpMethod']
         if operation != 'POST':
-            return respond(ValueError('Unsupported method {}'.format(operation)))
+            return default_resp(ValueError('Unsupported method {}'.format(operation)))
         identity = event['requestContext']['identity']
         req_fields['user_agent'] = identity['userAgent']
         req_fields['source_ip'] = identity['sourceIp']
     else:
         req_fields['user_agent'] = "dummy user agent"
         req_fields['source_ip'] = "1.1.1.1"
+
+    try:
+        raise_on_rate_limit(req_fields['source_ip'], ret_body['action'])
+    except ValidationError as e:
+        return default_resp(e)
 
     try:
         item = get_item_from_id(ret_body['id'])
@@ -182,13 +126,13 @@ def handler(event, context):
                 raise ValidationError("Unable to cancel submission")
             if item['key'] != ret_body['key']:
                 # fake the delete even though it won't be done
-                return respond(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})
+                return default_resp(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})
             delete_item(key_id)
         else:
             increment_action(key_id, ret_body['action'])
         item_new = merge_two_dicts(item, req_fields)
         add_updates_for_action(merge_two_dicts({"action": ret_body['action']}, item_new))
     except ValidationError, e:
-        return respond(e)
+        return default_resp(e)
 
-    return respond(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})
+    return default_resp(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})

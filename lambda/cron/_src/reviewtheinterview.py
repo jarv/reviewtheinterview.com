@@ -7,7 +7,7 @@ import json
 import decimal
 
 LOG = logging.getLogger()
-LOG.setLevel(logging.ERROR)
+LOG.setLevel(logging.WARN)
 
 BUCKET = "testing.reviewtheinterview.com"
 PENDING_KEY = "pending-reviews/pending-reviews.json"
@@ -33,8 +33,10 @@ def delete_item(key_id):
     dynamo_submissions = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
     dynamo_submissions.delete_item(Key={'id': key_id})
 
+
 def get_items(p):
     return sorted([{k: value_convert(d[k]) for k in FIELDS} for d in p['Items']], key=lambda d: d['create_time'], reverse=True)
+
 
 def handler(event, context):
     s = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)

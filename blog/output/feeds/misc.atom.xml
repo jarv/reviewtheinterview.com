@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Review the Interview</title><link href="https://about.reviewtheinterview.com/" rel="alternate"></link><link href="https://about.reviewtheinterview.com/feeds/misc.atom.xml" rel="self"></link><id>https://about.reviewtheinterview.com/</id><updated>2016-11-27T00:00:00-05:00</updated><entry><title>My first server-less side project</title><link href="https://about.reviewtheinterview.com/hello-world.html" rel="alternate"></link><published>2016-11-27T00:00:00-05:00</published><updated>2016-11-27T00:00:00-05:00</updated><author><name>john</name></author><id>tag:about.reviewtheinterview.com,2016-11-27:hello-world.html</id><summary type="html">&lt;p&gt;I present to you my first server-less side project &lt;a href="https://reviewtheinterview.com"&gt;reviewtheinterview.com&lt;/a&gt;.
+This took about 3 weekends to make and was mostly an excuse build something from the ground up and learn some new stuff along the way.&lt;/p&gt;
+&lt;p&gt;Here are some high level details on the tech stack:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Backend&lt;/strong&gt;:&lt;ul&gt;
+&lt;li&gt;AWS (Route53, Lamda, S3, API Gateway, CloudFront, DynamoDB, CloudWatch)  - Everything for this site is hosted in a single AWS account and well within the free tier, especially since there are no EC2 instances.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/garnaat/kappa"&gt;Kappa&lt;/a&gt; - Helpful for managing collections of lambda functions, Cloudformation is getting better but still not ready yet imo.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Frontend&lt;/strong&gt;:&lt;ul&gt;
+&lt;li&gt;The front-end is nothing special, no big framework, just straight javascript with the underscore library sass/bourbon/neat for the grid layout and typography.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://emojione.com/"&gt;EmojiOne&lt;/a&gt; for the artwork.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://leaverou.github.io/awesomplete/"&gt;Awesomplete&lt;/a&gt; for auto-complete though it's not very useful as it is now.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://daneden.github.io/animate.css/"&gt;Animate.css&lt;/a&gt; for the animations that I went over-board on.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary></entry></feed>

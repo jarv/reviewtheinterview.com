@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="comment">
+  <div class="comment-content">
+    <header class="post">
+      <h1 class="content-entry-title"> {{ article.title }} </h1> 
+    </header>
+    <footer class="post-info">
+      <abbr>
+        {{ article.locale_date }} 
+      </abbr>
+    </footer><!-- /.post-info -->
+    <div class="entry-content">
+      {{ article.content }}
+    </div><!-- /.entry-content -->
+  </div>
+</section>
+{% endblock %}
