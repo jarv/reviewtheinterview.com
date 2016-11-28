@@ -129,7 +129,12 @@ def handler(event, context):
                 return default_resp(None, {'id': key_id, 'action': ret_body['action'], 'status': 'success'})
             delete_item(key_id)
         else:
-            increment_action(key_id, ret_body['action'])
+            if item['source_ip'] == req_fields['source_ip']:
+                # action on your own submission maybe, we will silently ignore
+                LOG.warn("{} is trying to do a '{}' on their own id {}".format(
+                    req_fields['source_ip'], ret_body['action'], key_id))
+            else:
+                increment_action(key_id, ret_body['action'])
         item_new = merge_two_dicts(item, req_fields)
         add_updates_for_action(merge_two_dicts({"action": ret_body['action']}, item_new))
     except ValidationError, e:

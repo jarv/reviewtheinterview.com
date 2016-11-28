@@ -13,11 +13,11 @@ BUCKET = "testing.reviewtheinterview.com"
 PENDING_KEY = "pending-reviews/pending-reviews.json"
 REVIEW_KEY = "reviews/reviews.json"
 SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
-FIELDS = ["id", "emoji", "company", "create_time", "position", "review"]
+FIELDS = ["id", "emoji", "company", "create_time", "position", "review", "location"]
 
-PENDING = Key('approve').lt(2)
-APPROVED = Key('approve').gte(2)
-REJECTED = Key('reject').gte(2)
+PENDING_THRESHOLD = Key('approve').lt(2)
+APPROVE_THRESHOLD = Key('approve').gte(2)
+REJECT_THRESHOLD = Key('reject').lt(2)
 
 
 def value_convert(v):
@@ -39,19 +39,11 @@ def get_items(p):
 
 
 def handler(event, context):
-    s = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
+    t = boto3.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
     s3 = boto3.resource('s3')
 
-    # rejected
-    r = s.scan(FilterExpression=REJECTED)
-    if 'Items' in r:
-        for i in r['Items']:
-            LOG.info("Deleting {}".format(i['id']))
-            print("Deleting {}".format(i['id']))
-            delete_item(i['id'])
-
     # pending
-    p = s.scan(FilterExpression=PENDING)
+    p = t.scan(FilterExpression=PENDING_THRESHOLD & REJECT_THRESHOLD)
     if 'Items' in p:
         pending = get_items(p)
         pending_contents = StringIO(json.dumps(pending, indent=4, sort_keys=True))
@@ -59,7 +51,7 @@ def handler(event, context):
         bucket.put_object(ContentType='application/json', CacheControl='no-cache, no-store, must-revalidate', Expires=0, ACL='public-read', Bucket=BUCKET, Key=PENDING_KEY, Body=pending_contents.read())
 
     # approved
-    a = s.scan(FilterExpression=APPROVED)
+    a = t.scan(FilterExpression=APPROVE_THRESHOLD & REJECT_THRESHOLD)
     if 'Items' in a:
         approved = get_items(a)
         approved_contents = StringIO(json.dumps(approved, indent=4, sort_keys=True))

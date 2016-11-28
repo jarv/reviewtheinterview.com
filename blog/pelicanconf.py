@@ -8,7 +8,7 @@ SITEURL = 'https://about.reviewtheinterview.com'
 FEED_RSS = 'rss.xml'
 
 PATH = 'content'
-
+GOOGLE_ANALYTICS_ID = 'UA-88070465-1'
 TIMEZONE = 'US/Eastern'
 THEME = 'reviewtheinterview'
 DEFAULT_LANG = u'en'

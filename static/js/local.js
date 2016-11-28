@@ -606,17 +606,18 @@
     head.appendChild(style);
   };
 
-  add_reviews = function(data, wrapper_id, callback) {
-    var comment,
+  add_reviews = function(data, wrapper_id, sample, callback) {
+    var comment, filtered_data,
         div = document.getElementById(wrapper_id);
-    data.forEach( function(item) {
-      // skip if it is your submission
-      if (_.contains(get_array_from_storage(MY_ID_STORAGE), item.id)) {
-        return;
-      }
-      if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
-        return;
-      }
+
+    filtered_data = _.reject(data, function(item) {
+      return _.contains(get_array_from_storage(MY_ID_STORAGE), item.id) ||
+        _.contains(get_array_from_storage(RATED_ID_STORAGE), item.id);
+    });
+    if (sample !== undefined) {
+      filtered_data = _.sample(filtered_data, sample);
+    }
+    filtered_data.forEach( function(item) {
       comment = create_comment(item, wrapper_id);
       div.appendChild(comment);
       add_emoji_style(item);
@@ -787,12 +788,12 @@
 
 
   show_pending_reviews = function() {
-    var request, data;
+    var request, data, to_add;
     request = create_cors_request("GET", "/pending-reviews/pending-reviews.json");
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
         data = JSON.parse(request.responseText);
-				add_reviews(_.sample(data, 2), 'pending-comments', update_pending_divider);
+				add_reviews(data, 'pending-comments', 2, update_pending_divider);
       } else {
         fade_in_out("Unable to get pending reviews", "flash-error");
       }

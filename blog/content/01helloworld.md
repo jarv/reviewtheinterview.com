@@ -1,9 +1,13 @@
-Title: My first server-less side project
+Title: Review the Interview
 Date: 2016-11-27
 Slug: hello-world
 
 I present to you my first server-less side project [reviewtheinterview.com](https://reviewtheinterview.com).
 This took about 3 weekends to make and was mostly an excuse build something from the ground up and learn some new stuff along the way.
+
+The idea behind the site is a simple way to collect short reviews from job interviews while keeping the barriers to submission as low as possible.
+This means complete anonymous submissions which is rife for spam and abuse. To counter this there is a simple review system where users are presented
+samples of pending submissions to approve randomly. Because there is no session data it needs to rely on user's source address for rate limiting.
 
 Here are some high level details on the tech stack:
 
