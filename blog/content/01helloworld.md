@@ -2,20 +2,23 @@ Title: Review the Interview
 Date: 2016-11-27
 Slug: hello-world
 
-I present to you my first server-less side project [reviewtheinterview.com](https://reviewtheinterview.com).
-This took about 3 weekends to make and was mostly an excuse build something from the ground up and learn some new stuff along the way.
 
-The idea behind the site is a simple way to collect short reviews from job interviews while keeping the barriers to submission as low as possible.
-This means complete anonymous submissions which is rife for spam and abuse. To counter this there is a simple review system where users are presented
-samples of pending submissions to approve randomly. Because there is no session data it needs to rely on user's source address for rate limiting.
+I've taken part in a few interviews recently and after some searching found that there weren't many quality sites for reviewing the interview experience.
+For other candidates like me I'm curious how the process felt. Were you treated well or was it terrible? Did you feel like the company communicated well or were they dragging it along unnecessarily?
+Lastly, and maybe the most important thing I would like to know before starting an interview is **were the interviewers interested in and invested in the process?**
 
-Here are some high level details on the tech stack:
+The idea wasn't to create another massive interview and company review site like [glassdoor](https://glassdoor.com) or a site for sharing coding problems like
+[career cup](https://careercup.com) or interview practice like [hacker rank](https://hackerrank.com) or [interviewing.io](https://interviewing.io). Rather it
+was to see how much data I can collect with an emoji and free-form text and share.
+So here we have [reviewtheinterview.com](https://reviewtheinterview.com) and the experiment begins...
 
-* **Backend**:
-    * AWS (Route53, Lamda, S3, API Gateway, CloudFront, DynamoDB, CloudWatch)  - Everything for this site is hosted in a single AWS account and well within the free tier, especially since there are no EC2 instances.
-    * [Kappa](https://github.com/garnaat/kappa) - Helpful for managing collections of lambda functions, Cloudformation is getting better but still not ready yet imo.
-* **Frontend**:
-    * The front-end is nothing special, no big framework, just straight javascript with the underscore library sass/bourbon/neat for the grid layout and typography.
-    * [EmojiOne](http://emojione.com/) for the artwork.
-    * [Awesomplete](https://leaverou.github.io/awesomplete/) for auto-complete though it's not very useful as it is now.
-    * [Animate.css](https://daneden.github.io/animate.css/) for the animations that I went over-board on.
+It was created with the following goals in mind:
+
+* Allow users to submit reviews anonymously.
+* Build in some rudimentary protection against spamming and malicious users.
+* Keep the cost to host it as low as possible, static site.
+* Minimal and simple design.
+* And of course on the tech side of things play around with some new stuff I haven't played with before..
+
+I'll be writing a series of posts on the site if you are interested, subscribe to the blog or follow @interviewemoji on twitter.
+
