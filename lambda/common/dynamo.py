@@ -7,9 +7,6 @@ import logging
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
 
-UPDATES_TABLE_NAME = 'reviewtheinterview-updates'
-SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
-
 
 class ValidationError(Exception):
     pass

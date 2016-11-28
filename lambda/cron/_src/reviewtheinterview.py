@@ -5,15 +5,9 @@ from boto3.dynamodb.conditions import Key
 from cStringIO import StringIO
 import json
 import decimal
-
+from common.config import BUCKET, PENDING_KEY, REVIEW_KEY, SUBMISSIONS_TABLE_NAME, FIELDS
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
-
-BUCKET = "testing.reviewtheinterview.com"
-PENDING_KEY = "pending-reviews/pending-reviews.json"
-REVIEW_KEY = "reviews/reviews.json"
-SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
-FIELDS = ["id", "emoji", "company", "create_time", "position", "review", "location"]
 
 PENDING_THRESHOLD = Key('approve').lt(2)
 APPROVE_THRESHOLD = Key('approve').gte(2)

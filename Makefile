@@ -1,5 +1,11 @@
 BASEDIR=$(CURDIR)
 OUTPUTDIR=$(BASEDIR)/static
+LAMBDADIR=$(CURDIR)/lambda
+# BUCKET := testing.reviewtheinterview.com
+BUCKET := reviewtheinterview.com
+EXCLUDE := --exclude "pending-reviews/pending-reviews.json" --exclude "reviews/reviews.json" --exclude "js/review-the-interview.js" --exclude "css/review-the-interview.css" --exclude "css/review-the-interview.css.map" --exclude "js/local.js"
+DISTID := E36S5C6L3HC1XI # reviewtheinterview.com
+# DISTID := E3QODGY5LWIHVA # testing.reviewtheinterview.com
 
 serve:
 	cd $(OUTPUTDIR); python -m SimpleHTTPServer 5555
@@ -18,9 +24,13 @@ flower:
 sync:
 	uglifyjs --compress --mangle -- $(OUTPUTDIR)/js/local.js > $(OUTPUTDIR)/js/review-the-interview.js
 	sed -i'' -e 's/local.js/review-the-interview.js/' $(OUTPUTDIR)/index.html
-	aws --region us-east-1 --profile reviewtheinterview s3 sync --exclude "pending-reviews/pending-reviews.json" --exclude "reviews/reviews.json" --exclude "js/review-the-interview.js" --exclude "css/review-the-interview.css" --exclude "css/review-the-interview.css.map" --exclude "js/local.js" --delete --acl public-read $(OUTPUTDIR)/ s3://testing.reviewtheinterview.com
-	aws --region us-east-1 --profile reviewtheinterview s3 cp --content-type "application/javascript" --cache-control "no-cache, no-store, must-revalidate" --expires 0 --acl public-read static/js/review-the-interview.js s3://testing.reviewtheinterview.com/js/review-the-interview.js
-	aws --region us-east-1 --profile reviewtheinterview s3 cp --content-type "text/css" --cache-control "no-cache, no-store, must-revalidate" --expires 0 --acl public-read static/css/review-the-interview.css s3://testing.reviewtheinterview.com/css/review-the-interview.css
-	aws --region us-east-1 --profile reviewtheinterview s3 cp --content-type "application/octet-stream" --cache-control "no-cache, no-store, must-revalidate" --expires 0 --acl public-read static/css/review-the-interview.css.map s3://testing.reviewtheinterview.com/css/review-the-interview.css.map
+	aws --region us-east-1 --profile reviewtheinterview s3 sync $(EXCLUDE) --delete --acl public-read $(OUTPUTDIR)/ s3://$(BUCKET)
+	for f in js/review-the-interview.js css/review-the-interview.css css/review-the-interview.css.map; do \
+	    aws --region us-east-1 --profile reviewtheinterview s3 cp --cache-control "no-cache, no-store, must-revalidate" --expires 0 --acl public-read static/$$f s3://$(BUCKET)/$$f; \
+	done
 	sed -i'' -e 's/review-the-interview\.js/local.js/' $(OUTPUTDIR)/index.html
-	aws --region us-east-1 --profile reviewtheinterview cloudfront create-invalidation --distribution-id E3QODGY5LWIHVA --paths '/*'
+	aws --region us-east-1 --profile reviewtheinterview cloudfront create-invalidation --distribution-id $(DISTID) --paths '/*'
+
+herp:
+	cd $(LAMBDADIR)
+	for d in cron submissions updates; do cd $(LAMBDADIR)/$$d; kappa deploy; done

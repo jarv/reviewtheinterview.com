@@ -7,13 +7,11 @@ import time
 import cgi
 from common.dynamo import max_lengths, min_lengths, SUBMIT_FIELDS, ValidationError, ACTION_FIELDS, raise_on_rate_limit
 from common.helpers import default_resp, merge_two_dicts
-
+from common.config import SUBMISSIONS_TABLE_NAME, UPDATES_TABLE_NAME
 # OVERALL_LENGTH = 140
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
-SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
-UPDATES_TABLE_NAME = 'reviewtheinterview-updates'
 
 
 def add_updates_for_action(item):

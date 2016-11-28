@@ -153,22 +153,26 @@ h3 {
   border-bottom: 1px solid transparentize($comment-color, 0.9);
   display: table;
   margin-bottom: $base-spacing;
-  padding-bottom: 1em;
-  padding-right: 1em;
-  padding-left: 1em;
+    padding: 0;
+  @include media(769px) {
+    padding-bottom: 1em;
+    padding-right: 1em;
+    padding-left: 1em;
+  }
   width: 100%;
   position: relative;
 
   .comment-image,
   .comment-content {
     display: table-cell;
-    height: 100px;
     vertical-align: $comment-image-vert-alignment;
     background-color: white;
     opacity: .8;
     z-index: 10;
     padding: 10px;
-    border-radius: 20px;
+    @include media(769px) {
+      border-radius: 20px;
+    }
   }
 
 //  .comment-content:before {
@@ -234,9 +238,11 @@ h3 {
   }
 }
 
-ul, li {
-  list-style-type: disc;
-  margin-left: 2em;
+.comment {
+  ul, li {
+    list-style-type: disc;
+    margin-left: 2em;
+  }
 }
 
 div.entry-content {

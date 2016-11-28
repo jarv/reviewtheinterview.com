@@ -24,6 +24,7 @@
       fade_in_add,
       fade_in_out,
       fade_out_delete,
+			first_time_flash,
       get_array_from_storage,
       pad,
       post_update,
@@ -211,7 +212,7 @@
     "Paris, France",
     "Bucharest, Romania",
     "Vienna, Austria",
-    "Hamburg[Notes",
+    "Hamburg, Germany",
     "Budapest, Hungary",
     "Warsaw, Poland",
     "Barcelona, Spain",
@@ -283,7 +284,9 @@
     "Bochum, Germany",
     "Cardiff, United Kingdom",
     "Bydgoszcz, Poland",
-		"Ljubljana, Slovenia"
+		"Ljubljana, Slovenia",
+    "Zürich, Switzerland",
+    "Bern, Switzerland"
   ];
 
   var major_us_cities = [
@@ -376,6 +379,19 @@
     e = document.getElementsByName("emoji");
     e.forEach(function(elem) { elem.disabled = value; });
   };
+
+  first_time_flash = function() {
+    localStorage.setItem("first_visit", "true");
+		var el;
+    el = document.getElementById("first-visit");
+		add_event_listener("click", el, function(e) {
+			add_class(el, "fadeOut");
+      setTimeout(function() {
+        el.style.display = 'none';
+			}, 2000);
+		});
+		el.style.display = '';
+	};
 
   fade_in_out = function(msg, id) {
     var el, to_add;
@@ -788,7 +804,7 @@
 
 
   show_pending_reviews = function() {
-    var request, data, to_add;
+    var data,
     request = create_cors_request("GET", "/pending-reviews/pending-reviews.json");
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
@@ -844,4 +860,5 @@
   show_my_ids();
   show_reviews();
   show_pending_reviews();
+	if (localStorage.getItem("first_visit") === null) { first_time_flash() };
 }());

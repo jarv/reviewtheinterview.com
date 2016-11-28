@@ -5,8 +5,9 @@ import boto3
 import re
 import time
 import decimal
-from common.dynamo import update, actions, max_lengths, regex_matches, UPDATE_FIELDS, ACTION_FIELDS, ValidationError, UPDATES_TABLE_NAME, SUBMISSIONS_TABLE_NAME, raise_on_rate_limit
+from common.dynamo import update, actions, max_lengths, regex_matches, UPDATE_FIELDS, ACTION_FIELDS, ValidationError, raise_on_rate_limit
 from common. helpers import default_resp, merge_two_dicts
+from common.config import SUBMISSIONS_TABLE_NAME, UPDATES_TABLE_NAME
 
 # b = boto3.session.Session(profile_name='reviewtheinterview', region_name='us-east-1')
 # s = b.resource('dynamodb').Table("reviewtheinterview-submissions")

@@ -47,29 +47,23 @@
     </header>
     <footer class="post-info">
       <abbr>
-        Sun 27 November 2016 
+        Mon 28 November 2016 
       </abbr>
     </footer><!-- /.post-info -->
     <div class="entry-content">
-      <p>I present to you my first server-less side project <a href="https://reviewtheinterview.com">reviewtheinterview.com</a>.
-This took about 3 weekends to make and was mostly an excuse build something from the ground up and learn some new stuff along the way.</p>
-<p>The idea behind the site is a simple way to collect short reviews from job interviews while keeping the barriers to submission as low as possible.
-This means complete anonymous submissions which is rife for spam and abuse. To counter this there is a simple review system where users are presented
-samples of pending submissions to approve randomly. Because there is no session data it needs to rely on user's source address for rate limiting.</p>
-<p>Here are some high level details on the tech stack:</p>
+      <p>I've taken part in a few interviews recently and after some searching found that there weren't many quality sites for reviewing the interview experience.
+For other candidates like me I'm curious how the process felt. Were you treated well or was it terrible? Did you feel like the company communicated well or were they dragging it along unnecessarily?
+Lastly, and maybe the most important thing I would like to know before starting an interview is <strong>were the interviewers invested in the process?</strong></p>
+<p>There are review sites out there for companies and interviews and this is not meant to be as full featured or a place to get a lot of in-depth detail.
+In my experience interviews are pretty different depending on the people in the loop.. What this site aims to do is capture the essense of an interview with an emoji and
+free form text.  So here is <a href="https://reviewtheinterview.com">reviewtheinterview.com</a> and the experiment begins...</p>
+<p>It was created with the following goals in mind:</p>
 <ul>
-<li><strong>Backend</strong>:<ul>
-<li>AWS (Route53, Lamda, S3, API Gateway, CloudFront, DynamoDB, CloudWatch)  - Everything for this site is hosted in a single AWS account and well within the free tier, especially since there are no EC2 instances.</li>
-<li><a href="https://github.com/garnaat/kappa">Kappa</a> - Helpful for managing collections of lambda functions, Cloudformation is getting better but still not ready yet imo.</li>
-</ul>
-</li>
-<li><strong>Frontend</strong>:<ul>
-<li>The front-end is nothing special, no big framework, just straight javascript with the underscore library sass/bourbon/neat for the grid layout and typography.</li>
-<li><a href="http://emojione.com/">EmojiOne</a> for the artwork.</li>
-<li><a href="https://leaverou.github.io/awesomplete/">Awesomplete</a> for auto-complete though it's not very useful as it is now.</li>
-<li><a href="https://daneden.github.io/animate.css/">Animate.css</a> for the animations that I went over-board on.</li>
-</ul>
-</li>
+<li>Allow users to submit reviews anonymously.</li>
+<li>Build in some rudimentary protection against spamming and malicious users.</li>
+<li>Keep the cost to host it as low as possible, static site, server-less.</li>
+<li>Minimal and simple front-end design, no heavy js frameworks.</li>
+<li>And of course on the tech side of things play around with some new stuff I haven't played with before..</li>
 </ul>
     </div><!-- /.entry-content -->
   </div>

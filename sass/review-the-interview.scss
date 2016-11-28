@@ -36,8 +36,12 @@ body {
 }
 
 .submission-box {
-  @include span-columns(8);
-  @include shift(2);
+  @include media(769px) {
+    @include span-columns(8);
+    @include shift(2);
+  }
+  @include span-columns(10);
+  @include shift(1);
 }
 
 .comment-box {
@@ -154,7 +158,10 @@ h2 {
   font-size: 1.5em;
   font-style: italic;
   font-weight: 100;
-  width: 50%;
+  width: 85%;
+  @include media(769px) {
+    width: 50%;
+  }
   margin: auto;
   text-align: center;
   color: lighten($p3, 15%);
@@ -312,8 +319,12 @@ h3 {
   display: table;
   margin-bottom: $base-spacing;
   padding-bottom: 1em;
-  padding-right: 1em;
-  padding-left: 1em;
+  @include media(769px) {
+    padding-right: 1em;
+    padding-left: 1em;
+  }
+  padding-right: .2em;
+  padding-left: .2em;
   width: 100%;
   position: relative;
 

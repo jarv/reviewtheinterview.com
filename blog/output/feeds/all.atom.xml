@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Review the Interview</title><link href="https://about.reviewtheinterview.com/" rel="alternate"></link><link href="https://about.reviewtheinterview.com/feeds/all.atom.xml" rel="self"></link><id>https://about.reviewtheinterview.com/</id><updated>2016-11-27T00:00:00-05:00</updated><entry><title>Review the Interview</title><link href="https://about.reviewtheinterview.com/hello-world.html" rel="alternate"></link><published>2016-11-27T00:00:00-05:00</published><updated>2016-11-27T00:00:00-05:00</updated><author><name>john</name></author><id>tag:about.reviewtheinterview.com,2016-11-27:hello-world.html</id><summary type="html">&lt;p&gt;I present to you my first server-less side project &lt;a href="https://reviewtheinterview.com"&gt;reviewtheinterview.com&lt;/a&gt;.
-This took about 3 weekends to make and was mostly an excuse build something from the ground up and learn some new stuff along the way.&lt;/p&gt;
-&lt;p&gt;The idea behind the site is a simple way to collect short reviews from job interviews while keeping the barriers to submission as low as possible.
-This means complete anonymous submissions which is rife for spam and abuse. To counter this there is a simple review system where users are presented
-samples of pending submissions to approve randomly. Because there is no session data it needs to rely on user's source address for rate limiting.&lt;/p&gt;
-&lt;p&gt;Here are some high level details on the tech stack:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Review the Interview</title><link href="https://about.reviewtheinterview.com/" rel="alternate"></link><link href="https://about.reviewtheinterview.com/feeds/all.atom.xml" rel="self"></link><id>https://about.reviewtheinterview.com/</id><updated>2016-11-27T00:00:00-05:00</updated><entry><title>Review the Interview</title><link href="https://about.reviewtheinterview.com/hello-world.html" rel="alternate"></link><published>2016-11-27T00:00:00-05:00</published><updated>2016-11-27T00:00:00-05:00</updated><author><name>john</name></author><id>tag:about.reviewtheinterview.com,2016-11-27:hello-world.html</id><summary type="html">&lt;p&gt;I've taken part in a few interviews recently and after some searching found that there weren't many quality sites for reviewing the interview experience.
+For other candidates like me I'm curious how the process felt. Were you treated well or was it terrible? Did you feel like the company communicated well or were they dragging it along unnecessarily?
+Lastly, and maybe the most important thing I would like to know before starting an interview is &lt;strong&gt;were the interviewers invested in the process?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There are review sites out there for companies and interviews and this is not meant to be as full featured or a place to get a lot of in-depth detail.
+In my experience interviews are pretty different depending on the people in the loop.. What this site aims to do is capture the essense of an interview with an emoji and
+free form text.  So here is &lt;a href="https://reviewtheinterview.com"&gt;reviewtheinterview.com&lt;/a&gt; and the experiment begins...&lt;/p&gt;
+&lt;p&gt;It was created with the following goals in mind:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Backend&lt;/strong&gt;:&lt;ul&gt;
-&lt;li&gt;AWS (Route53, Lamda, S3, API Gateway, CloudFront, DynamoDB, CloudWatch)  - Everything for this site is hosted in a single AWS account and well within the free tier, especially since there are no EC2 instances.&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://github.com/garnaat/kappa"&gt;Kappa&lt;/a&gt; - Helpful for managing collections of lambda functions, Cloudformation is getting better but still not ready yet imo.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Frontend&lt;/strong&gt;:&lt;ul&gt;
-&lt;li&gt;The front-end is nothing special, no big framework, just straight javascript with the underscore library sass/bourbon/neat for the grid layout and typography.&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://emojione.com/"&gt;EmojiOne&lt;/a&gt; for the artwork.&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://leaverou.github.io/awesomplete/"&gt;Awesomplete&lt;/a&gt; for auto-complete though it's not very useful as it is now.&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://daneden.github.io/animate.css/"&gt;Animate.css&lt;/a&gt; for the animations that I went over-board on.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
+&lt;li&gt;Allow users to submit reviews anonymously.&lt;/li&gt;
+&lt;li&gt;Build in some rudimentary protection against spamming and malicious users.&lt;/li&gt;
+&lt;li&gt;Keep the cost to host it as low as possible, static site, server-less.&lt;/li&gt;
+&lt;li&gt;Minimal and simple front-end design, no heavy js frameworks.&lt;/li&gt;
+&lt;li&gt;And of course on the tech side of things play around with some new stuff I haven't played with before..&lt;/li&gt;
 &lt;/ul&gt;</summary></entry></feed>
