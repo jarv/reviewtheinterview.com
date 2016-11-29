@@ -3,6 +3,7 @@ import boto3
 import time
 from boto3.dynamodb.conditions import Key, Attr
 import logging
+from config import UPDATES_TABLE_NAME
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
