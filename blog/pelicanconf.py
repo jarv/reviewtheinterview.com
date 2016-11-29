@@ -3,14 +3,14 @@
 from __future__ import unicode_literals
 
 AUTHOR = u'john'
-SITENAME = u'Review the Interview'
-SITEURL = 'https://about.reviewtheinterview.com'
+SITENAME = u'Submit your Salary'
+SITEURL = 'https://about.submityoursalary.com'
 FEED_RSS = 'rss.xml'
 
 PATH = 'content'
 GOOGLE_ANALYTICS_ID = 'UA-88070465-1'
 TIMEZONE = 'US/Eastern'
-THEME = 'reviewtheinterview'
+THEME = 'submityoursalary'
 DEFAULT_LANG = u'en'
 
 # Feed generation is usually not desired when developing
@@ -34,7 +34,7 @@ EXTRA_PATH_METADATA = {
     'extra/robots.txt': {'path': 'robots.txt'},
     'extra/favicon.ico': {'path': 'favicon.ico'}
     }
-EMAIL = 'info@reviewtheinterview.com'
+EMAIL = 'info@submityoursalary.com'
 SOCIAL = [
         ('twitter', 'https://twitter.com/interviewemoji')
         ]

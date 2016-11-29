@@ -2,12 +2,12 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Review the Interview
+  title: Submit your Salary
   description: |
-    Review the Interview
+    Submit your Salary
 schemes:
   - http
-host: reviewtheinterview.com
+host: submityoursalary.com
 basePath: /
 paths:
   /submit:

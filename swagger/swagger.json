@@ -2,13 +2,13 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "Review the Interview",
-        "description": "Review the Interview\n"
+        "title": "Submit your Salary",
+        "description": "Submit your Salary\n"
     },
     "schemes": [
         "http"
     ],
-    "host": "reviewtheinterview.com",
+    "host": "submityoursalary.com",
     "basePath": "/",
     "paths": {
         "/submit": {

@@ -7,10 +7,10 @@ import logging
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.DEBUG)
-BUCKET = "testing.reviewtheinterview.com"
+BUCKET = "testing.submityoursalary.com"
 PENDING_KEY = "pending-reviews/pending-reviews.json"
 REVIEW_KEY = "reviews/reviews.json"
-SUBMISSIONS_TABLE_NAME = 'reviewtheinterview-submissions'
+SUBMISSIONS_TABLE_NAME = 'submityoursalary-submissions'
 
 
 def value_convert(v):
@@ -26,7 +26,7 @@ def delete_item(key_id):
     dynamo_submissions = b.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
     dynamo_submissions.delete_item(Key={'id': key_id})
 
-b = boto3.session.Session(profile_name='reviewtheinterview', region_name='us-east-1')
+b = boto3.session.Session(profile_name='submityoursalary', region_name='us-east-1')
 s = b.resource('dynamodb').Table(SUBMISSIONS_TABLE_NAME)
 s3 = b.resource('s3')
 

@@ -17,7 +17,7 @@ SSH_PORT=22
 SSH_USER=root
 SSH_TARGET_DIR=/var/www
 
-S3_BUCKET=about.reviewtheinterview.com
+S3_BUCKET=about.submityoursalary.com
 
 CLOUDFILES_USERNAME=my_rackspace_username
 CLOUDFILES_API_KEY=my_rackspace_api_key
@@ -112,7 +112,7 @@ ftp_upload: publish
 	lftp ftp://$(FTP_USER)@$(FTP_HOST) -e "mirror -R $(OUTPUTDIR) $(FTP_TARGET_DIR) ; quit"
 
 sync: publish
-	aws --profile reviewtheinterview s3 sync $(OUTPUTDIR)/ s3://$(S3_BUCKET) --acl public-read 
+	aws --profile submityoursalary s3 sync $(OUTPUTDIR)/ s3://$(S3_BUCKET) --acl public-read 
 
 cf_upload: publish
 	cd $(OUTPUTDIR) && swift -v -A https://auth.api.rackspacecloud.com/v1.0 -U $(CLOUDFILES_USERNAME) -K $(CLOUDFILES_API_KEY) upload -c $(CLOUDFILES_CONTAINER) .
@@ -122,5 +122,5 @@ github: publish
 	git push origin $(GITHUB_PAGES_BRANCH)
 
 wsass:
-	sass --watch reviewtheinterview/sass:reviewtheinterview/static/css --style compressed 
+	sass --watch submityoursalary/sass:submityoursalary/static/css --style compressed 
 .PHONY: html help clean regenerate serve serve-global devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload s3_upload cf_upload github
