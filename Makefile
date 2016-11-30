@@ -31,6 +31,6 @@ sync:
 	sed -i'' -e 's/submit-your-salary\.js/local.js/' $(OUTPUTDIR)/index.html
 	aws --region us-east-1 --profile submityoursalary cloudfront create-invalidation --distribution-id $(DISTID) --paths '/*'
 
-herp:
+kappa:
 	cd $(LAMBDADIR)
 	for d in cron submissions updates; do cd $(LAMBDADIR)/$$d; kappa deploy; done

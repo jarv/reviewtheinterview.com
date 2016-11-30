@@ -31,6 +31,7 @@
       remove_class,
       remove_id_from_storage,
       review_all,
+      review_salaryinput,
       review_textinput,
       show_my_ids,
       show_pending_reviews,
@@ -40,11 +41,11 @@
       update_pending_divider,
 			validate_all_input;
 
-  var UPDATE_URL = "https://3x1gqtafv9.execute-api.us-east-1.amazonaws.com/prod/update";
+  var UPDATE_URL = "https://1alvmeby4e.execute-api.us-east-1.amazonaws.com/prod/update";
   var MY_ID_STORAGE = "my_ids"; // local storage for reviews created by the user.
   var RATED_ID_STORAGE = "rated_ids"; // local storage for reviews that have been rated already and shouldn't be seen.
-  var FORM_IDS = ['input-review', 'input-company',
-                  'input-position', 'input-location', 'input-button'];
+  var FORM_IDS = ['input-review', 'input-company', 'currency', 'age', 'gender',
+                  'input-position', 'input-location', 'input-button', 'input-salary'];
   // functions
   //
   
@@ -52,14 +53,16 @@
     'input-company': 3,
     'input-location': 5,
     'input-position': 3,
-    'input-review': 10
+    'input-review': 10,
+    'input-salary': 3 
   };
 
   var MAX_LENGTHS = {
     'input-company':  30,
     'input-location': 50,
     'input-position': 40,
-    'input-review': 140
+    'input-review': 140,
+    'input-salary': 7 
   };
 
   var OVERALL_LENGTH = 140;
@@ -384,7 +387,7 @@
     localStorage.setItem("first_visit", "true");
 		var el;
     el = document.getElementById("first-visit");
-		add_event_listener("click", el, function(e) {
+		add_event_listener("click", el, function() {
 			add_class(el, "fadeOut");
       setTimeout(function() {
         el.style.display = 'none';
@@ -609,17 +612,20 @@
   };
 
   add_emoji_style = function(item) {
-    var css = '#' + item.id + ':before' + '{ background-image: url("/img/' + item.emoji.replace(/^e/, '') + '.png"); }',
-        head = document.head || document.getElementsByTagName('head')[0],
-        style = document.createElement('style');
-
-    style.type = 'text/css';
-    if (style.styleSheet){
-      style.styleSheet.cssText = css;
-    } else {
-      style.appendChild(document.createTextNode(css));
-    }
-    head.appendChild(style);
+    var el = document.getElementById(item.id);
+    add_class(el, item.emoji + "comment");
+//    console.log(el);
+//    var css = '#' + item.id + ':before' + '{ background-image: url("/img/' + item.emoji.replace(/^e/, '') + '.png"); }',
+//        head = document.head || document.getElementsByTagName('head')[0],
+//        style = document.createElement('style');
+//
+//    style.type = 'text/css';
+//    if (style.styleSheet){
+//      style.styleSheet.cssText = css;
+//    } else {
+//      style.appendChild(document.createTextNode(css));
+//    }
+//    head.appendChild(style);
   };
 
   add_reviews = function(data, wrapper_id, sample, callback) {
@@ -650,12 +656,17 @@
     position_el = document.getElementById("input-position"); 
     location_el = document.getElementById("input-location"); 
     sub_el = document.getElementById("review-submit");
-
+    salary_el = document.getElementById("input-salary");
+    age = document.getElementById("age").value;
+    gender = document.getElementById("gender").value;
     validate_msg = [review_textinput(review_el),
 										review_textinput(company_el),
 										review_textinput(position_el),
 										review_textinput(location_el),
-                    review_all(sub_el)];
+                    review_all(sub_el),
+                    review_salaryinput(salary_el),
+                    age === "" ? "Please select from the age dropdown" : null, 
+                    gender === "" ? "Please select from the gender dropdown" : null];
 		return(_.compact(validate_msg));
 	};
 
@@ -695,7 +706,7 @@
         resp = JSON.parse(xhr.responseText);
         localStorage.setItem(resp.id, JSON.stringify(resp));
         add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
-        clear_input_fields();
+        // clear_input_fields();
       }
     };
     xhr.onreadystatechange = function() {
@@ -723,10 +734,6 @@
         rem_el, msg = null;
     rem_wrap = document.getElementById("num-remaining-wrap");
     total = total + document.getElementById("input-review").value.length;
-    // FORM_IDS.forEach(function(id) {
-    //   f_el = document.getElementById(id);
-    //   total = total + f_el.value.length;
-    // });
     remaining = OVERALL_LENGTH - total;
     rem_el = document.getElementById("num-remaining");
     if (remaining > 0) {
@@ -739,6 +746,51 @@
     }
     return msg;
   };
+  
+
+  contains_digits = function(value) {
+    if (value.length > 0) {
+      if( ! /^[0-9]+$/.test(value) ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  review_salaryinput = function(el) {
+    var span_el, msg = null,
+				disp_name = el.id.replace("input-", "").charAt(0).toUpperCase() + el.id.replace("input-", "").slice(1);
+    span_el = document.getElementById(el.id.replace('input', 'span'));
+
+    if (el.value.length > MAX_LENGTHS[el.id] || ! contains_digits(el.value)) {
+      add_class(el, "overflow");
+      remove_class(span_el, "valid");
+      remove_class(span_el, "fa");
+      remove_class(span_el, "fa-check-circle");
+      if (! contains_digits(el.value) ) {
+        msg = disp_name + " must contain digits.";
+      } else {
+        msg = disp_name + " is too long.";
+      }
+    } else {
+      remove_class(el, "overflow");
+    }
+
+    if (el.value.length < MIN_LENGTHS[el.id]) {
+			msg = disp_name + " is too short.";
+		}
+    if (contains_digits(el.value) && el.value.length <= MAX_LENGTHS[el.id] && el.value.length >= MIN_LENGTHS[el.id]) {
+      add_class(span_el, "valid");
+      add_class(span_el, "fa");
+      add_class(span_el, "fa-check-circle");
+    } else {
+      remove_class(span_el, "valid");
+      remove_class(span_el, "fa");
+      remove_class(span_el, "fa-check-circle");
+    }
+    return msg;
+  };
+
 
   review_textinput = function(el) {
     var span_el, msg = null,
@@ -771,24 +823,42 @@
   };
 
   add_event_listeners = function() {
-     var sub_el, review_el,
-        company_el, position_el, location_el, clear_el;
+     var sub_el, review_el, currency_el,
+        company_el, position_el, location_el, clear_el, salary_el, d;
     review_el = document.getElementById("input-review"); 
     company_el = document.getElementById("input-company"); 
     position_el = document.getElementById("input-position"); 
     location_el = document.getElementById("input-location"); 
+    salary_el = document.getElementById("input-salary"); 
     sub_el = document.getElementById("review-submit");
     clear_el = document.getElementById("clear-local-storage");
+    currency_el = document.getElementById("currency");
     add_event_listener("submit", sub_el, submit_review);
     add_event_listener("input", review_el, function() { review_textinput(review_el); });
     add_event_listener("input", company_el, function() { review_textinput(company_el); });
     add_event_listener("input", position_el, function() { review_textinput(position_el); });
     add_event_listener("input", location_el, function() { review_textinput(location_el); });
+    add_event_listener("input", salary_el, function() { console.log("herp"); review_salaryinput(salary_el); });
     add_event_listener("input", sub_el, function() { review_all(sub_el); });
     add_event_listener("awesomplete-selectcomplete", location_el, function() { review_textinput(location_el); });
     add_event_listener("awesomplete-selectcomplete", company_el, function() { review_textinput(company_el); });
     add_event_listener("awesomplete-selectcomplete", position_el, function() { review_textinput(position_el); });
     add_event_listener("click", clear_el, function(e) { e.preventDefault(); localStorage.clear(); fade_in_out("All local state removed, refresh page to see update", "flash-info"); });
+    add_event_listener("change", currency_el, function(e) {
+      e.preventDefault();
+      d = document.getElementById("input-symbol");
+      switch(currency_el.value) {
+        case "USD":
+          d.className = "input-symbol-dollar";      
+          break;
+        case "EUR":
+          d.className = "input-symbol-euro";      
+          break;
+        case "GBP":
+          d.className = "input-symbol-gbp";      
+          break;
+      }
+    }); 
     // document.addEventListener("touchstart", function(){undefined;}, true);
 
   };
@@ -860,5 +930,5 @@
   show_my_ids();
   show_reviews();
   show_pending_reviews();
-	if (localStorage.getItem("first_visit") === null) { first_time_flash() };
+	if (localStorage.getItem("first_visit") === null) { first_time_flash(); }
 }());

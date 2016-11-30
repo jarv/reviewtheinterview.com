@@ -29,10 +29,10 @@
           </div>
 				</noscript>
         <div id="first-visit" class="flash flash-info animated fadeInDown" style="display: none;">
-          Hi!  I put together this site after going through a few interviews and realizing there wasn't
-          much out there for reviewing the interview experience.  What this site aims to do is collect
-          short interview reviews with an emoji and free form text. 
-          If you have an interview experience to share please submit a review!
+          Hi! I put together this site after not being able to find a simple place to look at 
+          salaries alongside of company reviews. This lead me to build submityoursalary.com, a simple
+          site to do just that. If you can spare a moment I would love to collect some basic
+          info about where you work through the form below. Thanks!
 					<br /><br />
 					<br /><a href="javascript:void">[ close ]</a>
         </div>
@@ -57,15 +57,47 @@
           </div>
           </div>
         </div> 
-        <h2>Anonymously review your latest interview with 140 characters and an emoji. Submissions tweeted at <a href="https://twitter.com/interviewemoji">@interviewemoji</a></h2>
+        <h2>Anonymously share how much you make along with an emoji and a short review of where you work.</a>.</h2>
         <div class="submission-box">
           <div class="submission">
-            <form id="review-submit" action="https://3x1gqtafv9.execute-api.us-east-1.amazonaws.com/prod/submit">
+            <form id="review-submit" action="https://1alvmeby4e.execute-api.us-east-1.amazonaws.com/prod/submit">
               <ul>
-                <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-company" placeholder="Company Name - ex: Google" name="company" /><span id="span-company"></i></div></li>
+                <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-company" placeholder="Company Name - ex: Google" name="company" /><span id="span-company"></span></div></li>
                 <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-position" placeholder="Position - ex: Software Engineer" name="position" /><span id="span-position"></span></div></li>
                 <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-location" placeholder="Location - City, State (or City, Country)" name="location" /><span id="span-location"></span></div></li>
-                <li><div class="input-wrapper"><textarea id="input-review" placeholder="review limit: 140 characters" name="review"></textarea><span id="span-review"></span></div></li>
+                <li><span class="salary-note">Salary is <b>yearly</b> gross (pre-tax) approximate income</span></li>
+                <li>
+                  <div class="input-wrapper">
+                      <select name="currency" id="currency">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                      </select>
+                      <div id="input-symbol" class="input-symbol-dollar">
+                        <div class="input-wrapper">
+                          <input type="text"  onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="input-salary" placeholder="Approximate yearly salary" name="salary" /><span id="span-salary"></span>
+                        </div>
+                      </div>
+                      <select name="age" id="age">
+                        <option value="" disabled selected>Select Age</option>
+                        <option value="20-30">20-29</option>
+                        <option value="30-40">30-39</option>
+                        <option value="40-50">40-49</option>
+                        <option value="50">50+</option>
+                        <option value="rather-not-say">rather-not-say</option>
+                      </select>
+                      <select name="gender" id="gender">
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                        <option value="rather-not-say">rather-not-say</option>
+                        <option value="other">other</option>
+                      </select>
+                    </div>
+                </li>
+                <li>
+                  <div class="input-wrapper"><textarea id="input-review" placeholder="say something about where you work - limit: 140 characters" name="review"></textarea><span id="span-review"></span></div>
+                </li>
               </ul>
               <h3 id="num-remaining-wrap">[ <span id="num-remaining">140</span> characters remaining ]</h3>
               <div class="emoji-selector">
@@ -82,7 +114,7 @@
                 <input id="e1f622" type="radio" name="emoji" value="e1f622">
                 <label for="e1f622" class="rating e1f622"></label>
               </div>
-              <button id="input-button" class="myButton">Submit Review</button>
+              <button id="input-button" class="myButton">Submit</button>
             </form>
           </div>
         </div>

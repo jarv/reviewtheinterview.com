@@ -1,8 +1,26 @@
 import json
 import logging
+import re
+from dynamo import REGEX_MATCHES, ValidationError
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
+
+
+def validated_body(body, fields):
+    if set(body.keys()) != fields:
+        LOG.warn("Wrong values in request, got {}".format(body.keys()))
+        raise ValidationError("Wrong values in request, expecting: {}, got: {}".format(
+            ",".join(list(fields)), ",".join(body.keys())))
+    for value in fields:
+        if value in REGEX_MATCHES:
+            LOG.warn(REGEX_MATCHES[value])
+            LOG.warn(body[value])
+            if not re.search(REGEX_MATCHES[value], body[value]):
+                LOG.warn("Validation error: {} doesn't match '{}'".format(body[value], REGEX_MATCHES[value]))
+                raise ValidationError("{} has invalid characters.".format(value))
+
+    return {k: body[k] for k in fields}
 
 
 def default_resp(err, res=None):

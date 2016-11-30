@@ -14,11 +14,16 @@ class ValidationError(Exception):
 
 
 class submit:
+    id = "id"
+    age = "age"
     company = "company"
+    currency = "currency"
     emoji = "emoji"
+    gender = "gender"
     location = "location"
     position = "position"
     review = "review"
+    salary = "salary"
 
 
 class update:
@@ -35,35 +40,7 @@ class actions:
     cancel = "cancel"
 
 
-class max_lengths:
-    id = 38
-    action = 100
-    key = 39
-    company = 30
-    location = 50
-    position = 40
-    review = 140
-    emoji = 10
-
-
-class min_lengths:
-    company = 3
-    emoji = 5
-    location = 5
-    position = 3
-    review = 10
-
-
-class regex_matches:
-    id = '^[\w_-]+$'
-    action = '^[\w_-]+$'
-    key = '.*'
-
-
-UPDATE_FIELDS = set([update.id,
-                     update.action,
-                     update.key,
-                     ])
+# Fields that are submitted by the user
 
 ACTION_FIELDS = set([actions.love,
                      actions.poo,
@@ -71,13 +48,36 @@ ACTION_FIELDS = set([actions.love,
                      actions.reject,
                      actions.cancel])
 
-SUBMIT_FIELDS = set([submit.company,
+SUBMIT_FIELDS = set([submit.age,
+                     submit.company,
+                     submit.currency,
                      submit.emoji,
+                     submit.gender,
                      submit.location,
                      submit.position,
                      submit.review,
+                     submit.salary,
                      ])
 
+REGEX_MATCHES = {
+    update.action: '^[\w_-]{0,100}$',
+    update.key: '^[\w_-]{0,40}$',
+    submit.id: '^[\w_-]{0,40}$',
+    submit.company: r'^.{3,30}$',
+    submit.location: r'^.{5,50}$',
+    submit.position: r'^.{3,50}$',
+    submit.review: r'^.{10,140}$',
+    submit.emoji: r'^.{5,10}$',
+    submit.salary: r'^\d{2,8}$',
+    submit.currency: r'^.{3}$',
+    submit.gender: r'^.{2,20}$',
+    submit.age: r'^.{2,20}$',
+}
+
+UPDATE_FIELDS = set([update.id,
+                     update.action,
+                     update.key,
+                     ])
 
 RATE_LIMITS = {
     "submit": dict(num=3, time_span=900),  # 15 * 60 * 60

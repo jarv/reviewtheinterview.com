@@ -5,7 +5,8 @@ from boto3.dynamodb.conditions import Key
 from cStringIO import StringIO
 import json
 import decimal
-from common.config import BUCKET, PENDING_KEY, REVIEW_KEY, SUBMISSIONS_TABLE_NAME, FIELDS
+from common.config import BUCKET, PENDING_KEY, REVIEW_KEY, SUBMISSIONS_TABLE_NAME, EXTRA_RETURN_FIELDS
+from common.dynamo import SUBMIT_FIELDS
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
 
@@ -29,7 +30,7 @@ def delete_item(key_id):
 
 
 def get_items(p):
-    return sorted([{k: value_convert(d[k]) for k in FIELDS} for d in p['Items']], key=lambda d: d['create_time'], reverse=True)
+    return sorted([{k: value_convert(d[k]) for k in list(EXTRA_RETURN_FIELDS) + list(SUBMIT_FIELDS)} for d in p['Items']], key=lambda d: d['create_time'], reverse=True)
 
 
 def handler(event, context):

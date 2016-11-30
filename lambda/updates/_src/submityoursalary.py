@@ -2,11 +2,10 @@
 import logging
 import json
 import boto3
-import re
 import time
 import decimal
-from common.dynamo import update, actions, max_lengths, regex_matches, UPDATE_FIELDS, ACTION_FIELDS, ValidationError, raise_on_rate_limit
-from common. helpers import default_resp, merge_two_dicts
+from common.dynamo import update, actions, UPDATE_FIELDS, ACTION_FIELDS, ValidationError, raise_on_rate_limit
+from common.helpers import default_resp, merge_two_dicts, validated_body
 from common.config import SUBMISSIONS_TABLE_NAME, UPDATES_TABLE_NAME
 
 # b = boto3.session.Session(profile_name='submityoursalary', region_name='us-east-1')
@@ -15,21 +14,6 @@ from common.config import SUBMISSIONS_TABLE_NAME, UPDATES_TABLE_NAME
 
 LOG = logging.getLogger()
 LOG.setLevel(logging.WARN)
-
-
-def validated_body(body):
-    if set(body.keys()) != UPDATE_FIELDS:
-        raise ValidationError("Wrong values in request, expecting: {}, got: {}".format(
-            ",".join(list(UPDATE_FIELDS)), ",".join(body.keys())))
-    for value in UPDATE_FIELDS:
-        if len(body[value]) > getattr(max_lengths, value):
-            raise ValidationError("{} length is too long.".format(value))
-        if not re.match(getattr(regex_matches, value), body[value]):
-            raise ValidationError("{} has invalid characters.".format(value))
-    if body[update.action] not in ACTION_FIELDS:
-        raise ValidationError("{} is not a valid action.".format(body[update.action]))
-
-    return {k: body[k] for k in UPDATE_FIELDS}
 
 
 def get_item_from_id(key_id):
@@ -93,7 +77,9 @@ def handler(event, context):
         return default_resp(ValidationError("Unable to parse request"))
 
     try:
-        ret_body = validated_body(body_from_json)
+        ret_body = validated_body(body_from_json, UPDATE_FIELDS)
+        if ret_body[update.action] not in ACTION_FIELDS:
+            raise ValidationError("{} is not a valid action.".format(ret_body[update.action]))
     except ValidationError, e:
         return default_resp(e)
 
@@ -115,7 +101,8 @@ def handler(event, context):
         req_fields['source_ip'] = "1.1.1.1"
 
     try:
-        raise_on_rate_limit(req_fields['source_ip'], ret_body['action'])
+        pass
+        # raise_on_rate_limit(req_fields['source_ip'], ret_body['action'])
     except ValidationError as e:
         return default_resp(e)
 

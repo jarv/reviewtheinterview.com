@@ -4,9 +4,9 @@ import json
 import boto3
 import uuid
 import time
-import cgi
-from common.dynamo import max_lengths, min_lengths, SUBMIT_FIELDS, ValidationError, ACTION_FIELDS, raise_on_rate_limit
-from common.helpers import default_resp, merge_two_dicts
+
+from common.dynamo import SUBMIT_FIELDS, ValidationError, ACTION_FIELDS, raise_on_rate_limit
+from common.helpers import default_resp, merge_two_dicts, validated_body
 from common.config import SUBMISSIONS_TABLE_NAME, UPDATES_TABLE_NAME
 # OVERALL_LENGTH = 140
 
@@ -26,20 +26,6 @@ def add_updates_for_action(item):
         raise ValidationError("Database error.")
 
 
-def validated_body(body):
-    if set(body.keys()) != SUBMIT_FIELDS:
-        raise ValidationError("Wrong values in request, expecting: {}, got: {}".format(
-            ",".join(list(SUBMIT_FIELDS)), ",".join(body.keys())))
-#    if sum(len(body[value]) for value in SUBMIT_FIELDS if value != 'emoji') > OVERALL_LENGTH:
-#        raise ValidationError("Submission is over {} chars".format(OVERALL_LENGTH))
-    for value in SUBMIT_FIELDS:
-        if len(body[value]) > getattr(max_lengths, value):
-            raise ValidationError("{} field must be less than {}.".format(value, getattr(max_lengths, value)))
-        if len(body[value]) < getattr(min_lengths, value):
-            raise ValidationError("{} field must be greater than {}.".format(value, getattr(min_lengths, value)))
-    return {k: cgi.escape(body[k]) for k in SUBMIT_FIELDS}
-
-
 def handler(event, context):
     if 'body' not in event:
         return default_resp(ValidationError("Missing body."))
@@ -50,7 +36,7 @@ def handler(event, context):
         return default_resp(ValidationError("Unable to parse request"))
 
     try:
-        ret_body = validated_body(body_from_json)
+        ret_body = validated_body(body_from_json, SUBMIT_FIELDS)
     except ValidationError, e:
         return default_resp(e)
 
@@ -72,7 +58,8 @@ def handler(event, context):
         req_fields['source_ip'] = "1.1.1.1"
 
     try:
-        raise_on_rate_limit(req_fields['source_ip'], "submit")
+        pass
+        # raise_on_rate_limit(req_fields['source_ip'], "submit")
     except ValidationError as e:
         return default_resp(e)
 

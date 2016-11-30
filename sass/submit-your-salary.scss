@@ -63,13 +63,21 @@ body {
 .poo {background-image:url(../img/other/1f4a9.png);}
 .love {background-image:url(../img/other/1f49f.png);}
 
-// for the comments
+// for the submission emojis
 .e1f620 {background-image:url(../img/1f620.png);}
 .e1f600 {background-image:url(../img/1f600.png);}
 .e1f627 {background-image:url(../img/1f627.png);}
 .e1f634 {background-image:url(../img/1f634.png);}
 .e1f631 {background-image:url(../img/1f631.png);}
 .e1f622 {background-image:url(../img/1f622.png);}
+
+// for the comment emojis
+.e1f620comment:before {background-image:url(../img/1f620.png);}
+.e1f600comment:before {background-image:url(../img/1f600.png);}
+.e1f627comment:before {background-image:url(../img/1f627.png);}
+.e1f634comment:before {background-image:url(../img/1f634.png);}
+.e1f631comment:before {background-image:url(../img/1f631.png);}
+.e1f622comment:before {background-image:url(../img/1f622.png);}
 
 .navbar {
   display: block;
@@ -185,6 +193,12 @@ h3 {
 }
 
 .submission {
+  .salary-note {
+    font-style: italic;
+    color: $p3;
+    font-weight: 10;
+  }
+
   // too many characters
   .overflow {
     background-color: #ffacac;
@@ -222,6 +236,11 @@ h3 {
     display: inline-block;
   }
 
+  select {
+    box-sizing: border-box;
+    display: inline-block;
+    -webkit-appearance: menulist-button;
+  }
   .tint {
     background-color: tint($p0, 50%);
   }
@@ -233,6 +252,57 @@ h3 {
     -ms-box-sizing: border-box; /* ie8 */
     -webkit-box-sizing: border-box; /* safari3 */
     -khtml-box-sizing: border-box; /* konqueror */
+    height: 2em;
+  }
+
+  select[name=currency] {
+    float: left;
+    height: 2em;
+    width: 14%;
+  }
+
+  #input-symbol {
+    position: relative;
+    float: left;
+    width: 35%;
+    margin-left: 1%;
+    input[name=salary] {
+      float: left;
+      width: 100%;
+      padding-left: 1.2em;
+      font-size: 1em;
+    }
+  }
+  #input-symbol:after {
+       position: absolute;
+       top: .2em;
+       color: lighten($p0, 20%);
+       font-size: 1em;
+  }
+  .input-symbol-euro:after {
+       content:"€";
+       right: 2em;
+  }
+  .input-symbol-gbp:after {
+       content:"£";
+       left: .5em;
+  }
+  .input-symbol-dollar:after {
+       content:"$";
+       left: .5em;
+  }
+
+  select[name=age] {
+    width: 24%;
+    float: left;
+    margin-left: 1%;
+    height: 2em;
+  }
+  select[name=gender] {
+    width: 24%;
+    float: left;
+    margin-left: 1%;
+    height: 2em;
   }
 }
 
@@ -563,8 +633,11 @@ input.valid {
   color: green;
   width: 200px;
 }
+
 div.input-wrapper {
   position: relative;
+  // still need this for containing floats :(
+  overflow: auto;  
 }
 span.valid {
 
