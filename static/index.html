@@ -57,7 +57,7 @@
           </div>
           </div>
         </div> 
-        <h2>Anonymously share how much you make along with an emoji and a short review of where you work.</a>.</h2>
+        <h2>Anonymously share how much you make along with an emoji and a short review of where you work.</h2>
         <div class="submission-box">
           <div class="submission">
             <form id="review-submit" action="https://1alvmeby4e.execute-api.us-east-1.amazonaws.com/prod/submit">
@@ -66,37 +66,50 @@
                 <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-position" placeholder="Position - ex: Software Engineer" name="position" /><span id="span-position"></span></div></li>
                 <li><div class="input-wrapper"><input type="text" class="awesomplete" id="input-location" placeholder="Location - City, State (or City, Country)" name="location" /><span id="span-location"></span></div></li>
                 <li><span class="salary-note">Salary is <b>yearly</b> gross (pre-tax) approximate income</span></li>
+              </ul>
+              <div class="inner-submission-box">
+                <ul>
+                  <li>
+                    <div class="input-wrapper">
+                        <select name="currency" id="currency">
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="GBP">GBP</option>
+                        </select>
+                        <div id="input-symbol" class="input-symbol-dollar">
+                          <div class="input-wrapper">
+                            <input type="text"  onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="input-salary" placeholder="Approximate yearly salary" name="salary" />
+                              <span id="span-salary"></span>
+                          </div>
+                        </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="input-wrapper">
+                        <select name="age" id="age">
+                          <option value="" disabled selected>Select Age</option>
+                          <option value="20-30">20-29</option>
+                          <option value="30-40">30-39</option>
+                          <option value="40-50">40-49</option>
+                          <option value="50">50+</option>
+                          <option value="rather-not-say">rather-not-say</option>
+                        </select>
+                        <select name="gender" id="gender">
+                          <option value="" disabled selected>Select Gender</option>
+                          <option value="male">male</option>
+                          <option value="female">female</option>
+                          <option value="rather-not-say">rather-not-say</option>
+                          <option value="other">other</option>
+                        </select>
+                      </div>
+                  </li>
+                </ul>
+              </div>
+              <ul>
                 <li>
                   <div class="input-wrapper">
-                      <select name="currency" id="currency">
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="GBP">GBP</option>
-                      </select>
-                      <div id="input-symbol" class="input-symbol-dollar">
-                        <div class="input-wrapper">
-                          <input type="text"  onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="input-salary" placeholder="Approximate yearly salary" name="salary" /><span id="span-salary"></span>
-                        </div>
-                      </div>
-                      <select name="age" id="age">
-                        <option value="" disabled selected>Select Age</option>
-                        <option value="20-30">20-29</option>
-                        <option value="30-40">30-39</option>
-                        <option value="40-50">40-49</option>
-                        <option value="50">50+</option>
-                        <option value="rather-not-say">rather-not-say</option>
-                      </select>
-                      <select name="gender" id="gender">
-                        <option value="" disabled selected>Select Gender</option>
-                        <option value="male">male</option>
-                        <option value="female">female</option>
-                        <option value="rather-not-say">rather-not-say</option>
-                        <option value="other">other</option>
-                      </select>
-                    </div>
-                </li>
-                <li>
-                  <div class="input-wrapper"><textarea id="input-review" placeholder="say something about where you work - limit: 140 characters" name="review"></textarea><span id="span-review"></span></div>
+                    <textarea id="input-review" placeholder="say something about where you work - limit: 140 characters" name="review"></textarea><span id="span-review"></span>
+                  </div>
                 </li>
               </ul>
               <h3 id="num-remaining-wrap">[ <span id="num-remaining">140</span> characters remaining ]</h3>

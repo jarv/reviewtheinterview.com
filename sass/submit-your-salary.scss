@@ -43,7 +43,15 @@ body {
   @include span-columns(10);
   @include shift(1);
 }
+.inner-submission-box {
+  @include media(769px) {
+    margin-right: 20%;
+    margin-left: 20%;
+  }
+  margin-right: 0;
+  margin-left: 0;
 
+}
 .comment-box {
 
 }
@@ -195,8 +203,7 @@ h3 {
 .submission {
   .salary-note {
     font-style: italic;
-    color: $p3;
-    font-weight: 10;
+    color: $p2;
   }
 
   // too many characters
@@ -254,55 +261,54 @@ h3 {
     -khtml-box-sizing: border-box; /* konqueror */
     height: 2em;
   }
-
-  select[name=currency] {
-    float: left;
-    height: 2em;
-    width: 14%;
-  }
-
-  #input-symbol {
-    position: relative;
-    float: left;
-    width: 35%;
-    margin-left: 1%;
-    input[name=salary] {
+  .inner-submission-box {
+    select[name=currency] {
       float: left;
-      width: 100%;
-      padding-left: 1.2em;
-      font-size: 1em;
+      height: 2em;
+      width: 20%;
     }
-  }
-  #input-symbol:after {
-       position: absolute;
-       top: .2em;
-       color: lighten($p0, 20%);
-       font-size: 1em;
-  }
-  .input-symbol-euro:after {
-       content:"€";
-       right: 2em;
-  }
-  .input-symbol-gbp:after {
-       content:"£";
-       left: .5em;
-  }
-  .input-symbol-dollar:after {
-       content:"$";
-       left: .5em;
-  }
 
-  select[name=age] {
-    width: 24%;
-    float: left;
-    margin-left: 1%;
-    height: 2em;
-  }
-  select[name=gender] {
-    width: 24%;
-    float: left;
-    margin-left: 1%;
-    height: 2em;
+    #input-symbol {
+      width: 79%;
+      margin-left: 1%;
+      position: relative;
+      float: left;
+      input[name=salary] {
+        float: left;
+        padding-left: 1.2em;
+        font-size: 1em;
+      }
+    }
+    #input-symbol:after {
+         position: absolute;
+         top: .2em;
+         color: darken($p2, 10%);
+         font-size: 1em;
+    }
+    .input-symbol-euro:after {
+         content:"€";
+         right: 2em;
+    }
+    .input-symbol-gbp:after {
+         content:"£";
+         left: .5em;
+    }
+    .input-symbol-dollar:after {
+         content:"$";
+         left: .5em;
+    }
+
+    select[name=age] {
+      float: left;
+      height: 2em;
+      width: 50%;
+    }
+    select[name=gender] {
+      float: left;
+      margin-left: 1%;
+      height: 2em;
+      width: 49%;
+    }
   }
 }
 
@@ -464,22 +470,38 @@ h3 {
       margin: 0 0 0.5em 0;
     }
 
+    div.comment-detail > div {
+      display: table-cell;
+    }
+
     div.comment-detail {
+      display: table;
+      font-size: 0.9em;
       line-height: 1.5em;
-      margin-bottom: 0.5em;
+      width: 100%;
       span.date {
         color: $comment-detail-color;
         font-size: 0.9em;
         font-style: italic;
       }
+      div.right {
+        text-align: right;
+        span.location {
+          margin-left: 1em;
+          color: $p0;
+          font-style: italic;
+        }
+        span.age {
 
-      span.location {
-        margin-left: 1em;
-        color: $p0;
-        font-size: 0.9em;
-        font-style: italic;
+        }
+        span.gender {
+
+        }
+        span.salary {
+          font-weight: bold;
+          font-size: 1em;
+        }
       }
-
     }
 
   }

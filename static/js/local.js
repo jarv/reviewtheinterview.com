@@ -18,6 +18,7 @@
       ajax_submit,
       autocompletion,
       clear_input_fields,
+      contains_digits,
       create_comment,
       create_cors_request,
       disable_all_input,
@@ -550,24 +551,39 @@
   };
 
   create_comment = function(item, type) {
-    var div_c = document.createElement('div');
+    var detail, div_c, div_cc, h_comp_pos, p_review,
+      div_detail, b;
+
+    div_c = document.createElement('div');
     div_c.setAttribute("class", "comment animated bounceIn");
 
-    var div_cc = document.createElement('div');
+    div_cc = document.createElement('div');
     div_cc.setAttribute("class", "comment-content");
     div_cc.id = item.id;
 
-    var h_comp_pos = document.createElement('h1');
+    h_comp_pos = document.createElement('h1');
     h_comp_pos.innerHTML = item.company + ' : ' + item.position; 
 
-    var p_review = document.createElement('p');
+    p_review = document.createElement('p');
     p_review.innerHTML = item.review;
 
-    var div_detail = document.createElement('div');
+    div_detail = document.createElement('div');
     div_detail.setAttribute("class", "comment-detail");
-    div_detail.innerHTML = '<span class="date">' + time_convert(item.create_time) + '</span><span class="location">Location: ' + item.location + '</span>';
+    detail = '<span class="date">' + time_convert(item.create_time) + '</span><div class="right">' +
+      '<span class="location">' + item.location + '</span> ';
+    if (item.age !== undefined && item.age !== 'rather-not-say') {
+      detail += '<span class="age"> ' + item.age + '</span> ';
+    }
+    if (item.age !== undefined && item.gender !== 'rather-not-say') {
+      detail += '<span class="gender">(' + item.gender + ')</span> ';
+    }
+    if (item.salary !== undefined && item.salary !== 'rather-not-say') {
+      detail += '<span class="salary">' + parseInt(item.salary).toLocaleString() + ' ' + item.currency + ' </span>';
+    }
+    detail += '</div>';
 
-    var b = document.createElement('div');
+    div_detail.innerHTML = detail;
+    b = document.createElement('div');
     b.setAttribute("class", "emoji-comment-selector");
     // 2620 skull
     // 1f4a9 poo
@@ -649,7 +665,8 @@
 
 	validate_all_input = function() {
 		var review_el, company_el, position_el,
-				location_el, validate_msg, sub_el;
+				location_el, validate_msg, sub_el,
+        salary_el, age, gender;
 
     review_el = document.getElementById("input-review"); 
     company_el = document.getElementById("input-company"); 
@@ -706,7 +723,7 @@
         resp = JSON.parse(xhr.responseText);
         localStorage.setItem(resp.id, JSON.stringify(resp));
         add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
-        // clear_input_fields();
+        clear_input_fields();
       }
     };
     xhr.onreadystatechange = function() {

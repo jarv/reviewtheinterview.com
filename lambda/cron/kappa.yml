@@ -1,0 +1,35 @@
+---
+name: submityoursalary-cron
+environments:
+  dev:
+    profile: submityoursalary
+    region: us-east-1
+    policy:
+      resources:
+        - arn: "arn:aws:logs:*:*:*"
+          actions:
+            - "*"
+        - arn: "arn:aws:dynamodb:us-east-1:414252096707:table/submityoursalary-updates"
+          actions:
+            - "*"
+        - arn: "arn:aws:dynamodb:us-east-1:414252096707:table/submityoursalary-submissions"
+          actions:
+            - "*"
+        - arn: "arn:aws:s3:::submityoursalary.com/*"
+          actions:
+            - "*"
+        - arn: "arn:aws:s3:::testing.submityoursalary.com/*"
+          actions:
+            - "*"
+
+    event_sources:
+      - arn: arn:aws:events:us-east-1:414252096707:rule/kappa-cron-dev
+        schedule: rate(1 minute)
+        description: cron to run this lambda function every minute
+        enabled: true
+lambda:
+  description: Cron that runs every minute
+  handler: submityoursalary.handler
+  runtime: python2.7
+  memory_size: 128
+  timeout: 3

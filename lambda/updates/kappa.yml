@@ -1,0 +1,24 @@
+---
+name: submityoursalary-update
+environments:
+  dev:
+    profile: submityoursalary
+    region: us-east-1
+    policy:
+      resources:
+        - arn: "arn:aws:dynamodb:us-east-1:414252096707:table/submityoursalary-updates"
+          actions:
+            - "*"
+        - arn: "arn:aws:dynamodb:us-east-1:414252096707:table/submityoursalary-submissions"
+          actions:
+            - "*"
+        - arn: "arn:aws:logs:*:*:*"
+          actions:
+            - "*"
+lambda:
+  description: Rate the Interview Updates
+  handler: submityoursalary.handler
+  runtime: python2.7
+  memory_size: 128
+  timeout: 3
+
