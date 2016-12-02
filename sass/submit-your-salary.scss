@@ -243,28 +243,35 @@ h3 {
     display: inline-block;
   }
 
+  // custom down arrow
+  //
+
+  input,
+  select {
+    height: 2.5em;
+    font-size: 1em;
+    -moz-appearance:none;
+    border-radius: 5px;
+  }
   select {
     box-sizing: border-box;
-    display: inline-block;
     -webkit-appearance: menulist-button;
+    display: inline-block;
   }
   .tint {
     background-color: tint($p0, 50%);
   }
   input[type=text] {
     display: inline-block;
-    border-radius: 5px;
     box-sizing: border-box; /* css3 rec */
     -moz-box-sizing: border-box; /* ff2 */
     -ms-box-sizing: border-box; /* ie8 */
     -webkit-box-sizing: border-box; /* safari3 */
     -khtml-box-sizing: border-box; /* konqueror */
-    height: 2em;
   }
   .inner-submission-box {
     select[name=currency] {
       float: left;
-      height: 2em;
       width: 20%;
     }
 
@@ -275,15 +282,14 @@ h3 {
       float: left;
       input[name=salary] {
         float: left;
-        padding-left: 1.2em;
-        font-size: 1em;
+        padding-left: 2em;
       }
     }
     #input-symbol:after {
          position: absolute;
-         top: .2em;
+         top: .1em;
          color: darken($p2, 10%);
-         font-size: 1em;
+         font-size: 1.5em;
     }
     .input-symbol-euro:after {
          content:"€";
@@ -300,13 +306,11 @@ h3 {
 
     select[name=age] {
       float: left;
-      height: 2em;
       width: 50%;
     }
     select[name=gender] {
       float: left;
       margin-left: 1%;
-      height: 2em;
       width: 49%;
     }
   }
@@ -658,7 +662,10 @@ input.valid {
 
 div.input-wrapper {
   position: relative;
-  // still need this for containing floats :(
+}
+
+div.input-overflow {
+  // for containing floats :(
   overflow: auto;  
 }
 span.valid {

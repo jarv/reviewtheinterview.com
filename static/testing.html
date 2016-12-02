@@ -70,22 +70,22 @@
               <div class="inner-submission-box">
                 <ul>
                   <li>
-                    <div class="input-wrapper">
+                    <div class="input-wrapper input-overflow">
                         <select name="currency" id="currency">
                           <option value="USD">USD</option>
                           <option value="EUR">EUR</option>
                           <option value="GBP">GBP</option>
                         </select>
                         <div id="input-symbol" class="input-symbol-dollar">
-                          <div class="input-wrapper">
-                            <input type="text"  onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="input-salary" placeholder="Approximate yearly salary" name="salary" />
+                          <div class="input-wrapper input-overflow">
+                            <input type="text" id="input-salary" placeholder="Approximate yearly salary" name="salary" />
                               <span id="span-salary"></span>
                           </div>
                         </div>
                     </div>
                   </li>
                   <li>
-                    <div class="input-wrapper">
+                    <div class="input-wrapper input-overflow">
                         <select name="age" id="age">
                           <option value="" disabled selected>Select Age</option>
                           <option value="20-30">20-29</option>
@@ -108,7 +108,7 @@
               <ul>
                 <li>
                   <div class="input-wrapper">
-                    <textarea id="input-review" placeholder="say something about where you work - limit: 140 characters" name="review"></textarea><span id="span-review"></span>
+                    <textarea id="input-review" placeholder="say something about where you work - min: 10, max:140" name="review"></textarea><span id="span-review"></span>
                   </div>
                 </li>
               </ul>

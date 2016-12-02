@@ -23,12 +23,12 @@ flower:
 	cd watcher;DJANGO_SETTINGS_MODULE=watcher.settings celery -A watcher.tasks flower --port=5556
 sync:
 	uglifyjs --compress --mangle -- $(OUTPUTDIR)/js/local.js > $(OUTPUTDIR)/js/submit-your-salary.js
-	sed -i'' -e 's/local.js/submit-your-salary.js/' $(OUTPUTDIR)/index.html
+	sed -i'' -e 's/local.js/submit-your-salary.js/' $(OUTPUTDIR)/testing.html
 	aws --region us-east-1 --profile submityoursalary s3 sync $(EXCLUDE) --delete --acl public-read $(OUTPUTDIR)/ s3://$(BUCKET)
 	for f in js/submit-your-salary.js css/submit-your-salary.css css/submit-your-salary.css.map; do \
 	    aws --region us-east-1 --profile submityoursalary s3 cp --cache-control "no-cache, no-store, must-revalidate" --expires 0 --acl public-read static/$$f s3://$(BUCKET)/$$f; \
 	done
-	sed -i'' -e 's/submit-your-salary\.js/local.js/' $(OUTPUTDIR)/index.html
+	sed -i'' -e 's/submit-your-salary\.js/local.js/' $(OUTPUTDIR)/testing.html
 	aws --region us-east-1 --profile submityoursalary cloudfront create-invalidation --distribution-id $(DISTID) --paths '/*'
 
 kappa:

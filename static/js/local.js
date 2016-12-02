@@ -707,12 +707,13 @@
           if (input.checked) {
             data[input.name] = input.value;
           }
-        } else {
+        } else if (input.name == 'salary') {
+					data[input.name] = input.value.replace(/\D/g,'');
+				} else {
           data[input.name] = input.value;
         }
       }
     }
-
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
       disable_all_input(false);
@@ -775,28 +776,30 @@
   };
 
   review_salaryinput = function(el) {
-    var span_el, msg = null,
+    var span_el, msg = null, clean_value,
 				disp_name = el.id.replace("input-", "").charAt(0).toUpperCase() + el.id.replace("input-", "").slice(1);
+		
+		if (! el.value) {
+			return;
+		}
+		clean_value = el.value.replace(/\D/g,'');
+		el.value = parseInt(clean_value).toLocaleString()
     span_el = document.getElementById(el.id.replace('input', 'span'));
 
-    if (el.value.length > MAX_LENGTHS[el.id] || ! contains_digits(el.value)) {
+    if (clean_value.length > MAX_LENGTHS[el.id]) {
       add_class(el, "overflow");
       remove_class(span_el, "valid");
       remove_class(span_el, "fa");
       remove_class(span_el, "fa-check-circle");
-      if (! contains_digits(el.value) ) {
-        msg = disp_name + " must contain digits.";
-      } else {
-        msg = disp_name + " is too long.";
-      }
+			msg = disp_name + " is too long.";
     } else {
       remove_class(el, "overflow");
     }
 
-    if (el.value.length < MIN_LENGTHS[el.id]) {
+    if (clean_value.length < MIN_LENGTHS[el.id]) {
 			msg = disp_name + " is too short.";
 		}
-    if (contains_digits(el.value) && el.value.length <= MAX_LENGTHS[el.id] && el.value.length >= MIN_LENGTHS[el.id]) {
+    if (clean_value.length <= MAX_LENGTHS[el.id] && clean_value.length >= MIN_LENGTHS[el.id]) {
       add_class(span_el, "valid");
       add_class(span_el, "fa");
       add_class(span_el, "fa-check-circle");
@@ -855,7 +858,7 @@
     add_event_listener("input", company_el, function() { review_textinput(company_el); });
     add_event_listener("input", position_el, function() { review_textinput(position_el); });
     add_event_listener("input", location_el, function() { review_textinput(location_el); });
-    add_event_listener("input", salary_el, function() { console.log("herp"); review_salaryinput(salary_el); });
+    add_event_listener("input", salary_el, function() { review_salaryinput(salary_el); });
     add_event_listener("input", sub_el, function() { review_all(sub_el); });
     add_event_listener("awesomplete-selectcomplete", location_el, function() { review_textinput(location_el); });
     add_event_listener("awesomplete-selectcomplete", company_el, function() { review_textinput(company_el); });
@@ -941,7 +944,7 @@
     request.send();
   };
   // ----------------
-
+  NodeList.prototype.forEach = Array.prototype.forEach;
   add_event_listeners();
   autocompletion();
   show_my_ids();
