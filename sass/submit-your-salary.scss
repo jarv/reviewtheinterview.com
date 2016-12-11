@@ -522,7 +522,7 @@ h3 {
     width: 60px; height: 60px;
   }
   .rating {
-      cursor:pointer;
+      position: relative;
       background-size:contain;
       background-repeat:no-repeat;
       display:inline-block;
@@ -531,11 +531,6 @@ h3 {
       // overflow:hidden;
       box-shadow: 0 0 2px gray;
       transition: all .1s ease-in-out;
-      &:focus,
-      &:hover{
-        transform: scale(1.1);
-      }
-
       &:not(.no-hover):hover .tooltip {
         -webkit-transition-delay: 500ms;
            -moz-transition-delay: 500ms;
@@ -610,6 +605,18 @@ $base-spacing: 1.5em !default;
 }
 
 // spinner
+.emoji-disable {
+  cursor: default;
+  opacity: .6;
+}
+
+.emoji-enable {
+  cursor:pointer;
+  &:focus,
+  &:hover{
+    transform: scale(1.1);
+  }
+}
 
 .spinner {
     -webkit-animation-name: spin;

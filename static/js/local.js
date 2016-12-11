@@ -9,7 +9,6 @@
 (function() {
 
   var add_class,
-      add_emoji_style,
       add_event_listener,
       add_event_listeners,
       add_id_to_storage,
@@ -22,6 +21,9 @@
       create_comment,
       create_cors_request,
       disable_all_input,
+      disable_emoji,
+      enable_emoji,
+      fade_disable,
       fade_in_add,
       fade_in_out,
       fade_out_delete,
@@ -73,6 +75,10 @@
       return s.substr(s.length-size);
   };
 
+	has_class = function(el, cls) {
+			return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
+	};
+
   time_convert = function(t) {     
     var a = new Date(t * 10),
         today = new Date(),
@@ -123,6 +129,10 @@
     el.appendChild(to_add);
     add_class(to_add, "fadeInDown");  
     if (typeof callback === 'function') { callback(); }
+  };
+
+  fade_disable = function(el, callback) {
+    console.log("disable");
   };
 
   fade_out_delete = function(el, callback) {
@@ -474,15 +484,37 @@
       item.myid = "true";
       comment = create_comment(item, 'your-comments');
       div.appendChild(comment);
-      add_emoji_style(item);
     });
   };
 
+  disable_emoji = function(el) {
+    el.parentNode.childNodes.forEach(function(child_el) {
+      add_class(child_el, "emoji-disable");
+      add_class(child_el, "no-hover");
+      remove_class(child_el, "emoji-enable");
+    });
+    add_class(el, "spinner");
+  };
+
+  enable_emoji = function(el) {
+    el.parentNode.childNodes.forEach(function(child_el) {
+      console.log(child_el);
+      remove_class(child_el, "emoji-disable");
+      add_class(child_el, "emoji-enable");
+      remove_class(child_el, "no-hover");
+    });
+    remove_class(el, "spinner");
+  };
 
   post_update = function(el, id, action) {
     var resp,
         xhr = create_cors_request("POST", UPDATE_URL),
         data = {}, elem, item;
+
+		if (has_class(el, "emoji-disable")) {
+			return;
+		}
+
     add_class(el, "no-hover");
 
     if (action === 'cancel') {
@@ -509,21 +541,26 @@
 
     xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
     xhr.onload = function() {
-      remove_class(el, "spinner");
-      remove_class(el, "no-hover");
       if (xhr.status !== 200) {
         fade_in_out(xhr.responseText, "flash-error");
+        enable_emoji(el);
       } else {
+        remove_class(el, "spinner");
         resp = JSON.parse(xhr.responseText);
         if (action === 'cancel') {
           remove_id_from_storage(resp.id, MY_ID_STORAGE, null);
           fade_in_out("Submission removed", "flash-info");  
           show_my_ids();
         } else {
-          add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
           fade_in_out("Feedback submitted, thanks!", "flash-info");  
+					add_id_to_storage(resp.id, RATED_ID_STORAGE, null);
           elem = document.getElementById(resp.id).parentNode;
-          fade_out_delete(elem, update_pending_divider);
+          if (action === 'poo' || action === 'love') {
+            console.log(elem);
+          } else {
+            // pending
+            fade_out_delete(elem, update_pending_divider);
+          }
         }
       }
     };
@@ -531,15 +568,14 @@
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {   //if complete
         if(xhr.status !== 200) {  //check if "OK" (200)
-          remove_class(el, "spinner");
-          remove_class(el, "no-hover");
+          enable_emoji(el);
           fade_in_out("Error sending request.", "flash-error");  
         }
       }
     };
 
     xhr.send(JSON.stringify(data));
-    add_class(el, "spinner");
+    disable_emoji(el);
   };
 
   add_tooltip = function(el, msg, type) {
@@ -555,10 +591,10 @@
       div_detail, b;
 
     div_c = document.createElement('div');
-    div_c.setAttribute("class", "comment animated bounceIn");
+    div_c.setAttribute("class", "comment animated fadeIn");
 
     div_cc = document.createElement('div');
-    div_cc.setAttribute("class", "comment-content");
+    div_cc.setAttribute("class", "comment-content " + item.emoji + "comment");
     div_cc.id = item.id;
 
     h_comp_pos = document.createElement('h1');
@@ -592,26 +628,35 @@
     // 2705 check2
     // 274c cancel
     if (type === "your-comments") {
-      var b1 = document.createElement('div'); b1.setAttribute("class", "rating cancel rating-small");
+      var b1 = document.createElement('div'); b1.setAttribute("class", "emoji-enable rating cancel rating-small");
       add_tooltip(b1, "Remove", "small");
       b.appendChild(b1);
       add_event_listener("click", b1, function() { post_update(b1, item.id, 'cancel');   });
       add_class(div_cc, "blue-border");
 
     } else if (type === "pending-comments") {
-      var b2 = document.createElement('div'); b2.setAttribute("class", "rating approve rating-big");
+      var b2 = document.createElement('div'); b2.setAttribute("class", "emoji-enable rating approve rating-big");
       add_tooltip(b2, "Approve!", "large");
-      var b3 = document.createElement('div'); b3.setAttribute("class", "rating reject rating-big");
+      var b3 = document.createElement('div'); b3.setAttribute("class", "emoji-enable rating reject rating-big");
       add_tooltip(b3, "Reject!", "large");
       b.appendChild(b2); b.appendChild(b3);
       add_event_listener("click", b2, function() { post_update(b2, item.id, 'approve'); });
       add_event_listener("click", b3, function() { post_update(b3, item.id, 'reject'); });
       add_class(div_cc, "yellow-border");
     } else { // type === comments
-      var b4 = document.createElement('div'); b4.setAttribute("class", "rating love rating-big");
+      var b4 = document.createElement('div'); b4.setAttribute("class", "emoji-enable rating love rating-big");
       add_tooltip(b4, "Love it!", "large");
-      var b5 = document.createElement('div'); b5.setAttribute("class", "rating poo rating-big");
+      var b5 = document.createElement('div'); b5.setAttribute("class", "emoji-enable rating poo rating-big");
       add_tooltip(b5, "Poo poo!", "large");
+      // disable the emojis if already rated
+			if (_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id)) {
+        add_class(b4, "emoji-disable");
+        add_class(b4, "no-hover");
+        remove_class(b4, "emoji-enable");
+        add_class(b5, "emoji-disable");
+        add_class(b5, "no-hover");
+        remove_class(b5, "emoji-enable");
+      }
       b.appendChild(b4); b.appendChild(b5);
       add_event_listener("click", b4, function() { post_update(b4, item.id, 'love'); });
       add_event_listener("click", b5, function() { post_update(b5, item.id, 'poo'); });
@@ -627,38 +672,21 @@
     return div_c;
   };
 
-  add_emoji_style = function(item) {
-    var el = document.getElementById(item.id);
-    add_class(el, item.emoji + "comment");
-//    console.log(el);
-//    var css = '#' + item.id + ':before' + '{ background-image: url("/img/' + item.emoji.replace(/^e/, '') + '.png"); }',
-//        head = document.head || document.getElementsByTagName('head')[0],
-//        style = document.createElement('style');
-//
-//    style.type = 'text/css';
-//    if (style.styleSheet){
-//      style.styleSheet.cssText = css;
-//    } else {
-//      style.appendChild(document.createTextNode(css));
-//    }
-//    head.appendChild(style);
-  };
-
   add_reviews = function(data, wrapper_id, sample, callback) {
-    var comment, filtered_data,
+    var comment, filtered_data = data,
         div = document.getElementById(wrapper_id);
-
-    filtered_data = _.reject(data, function(item) {
-      return _.contains(get_array_from_storage(MY_ID_STORAGE), item.id) ||
-        _.contains(get_array_from_storage(RATED_ID_STORAGE), item.id);
-    });
+		if (wrapper_id !== "comments") {
+			filtered_data = _.reject(data, function(item) {
+				return _.contains(get_array_from_storage(MY_ID_STORAGE), item.id) ||
+					_.contains(get_array_from_storage(RATED_ID_STORAGE), item.id);
+			});
+		}
     if (sample !== undefined) {
       filtered_data = _.sample(filtered_data, sample);
     }
     filtered_data.forEach( function(item) {
       comment = create_comment(item, wrapper_id);
       div.appendChild(comment);
-      add_emoji_style(item);
     });
     if (typeof callback === 'function') { callback(); }
   };
@@ -723,7 +751,7 @@
         fade_in_out("Submitted! Your submission will be pending until it is approved by another person viewing the site.", "flash-info");
         resp = JSON.parse(xhr.responseText);
         localStorage.setItem(resp.id, JSON.stringify(resp));
-        add_id_to_storage(resp.id, MY_ID_STORAGE, show_my_ids);
+        add_id_to_storage(resp.id, "MY_ID_STORAGE", show_my_ids);
         clear_input_fields();
       }
     };

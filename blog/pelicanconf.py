@@ -36,7 +36,7 @@ EXTRA_PATH_METADATA = {
     }
 EMAIL = 'info@submityoursalary.com'
 SOCIAL = [
-        ('twitter', 'https://twitter.com/interviewemoji')
+        ('twitter', 'https://twitter.com/salarysubmit')
         ]
 
 LOAD_CONTENT_CACHE = False

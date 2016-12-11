@@ -8,19 +8,11 @@ DISTID := E36S5C6L3HC1XI # submityoursalary.com
 # DISTID := E3QODGY5LWIHVA # testing.submityoursalary.com
 
 serve:
-	cd $(OUTPUTDIR); python -m SimpleHTTPServer 5555
+	cd $(OUTPUTDIR); python3 -m http.server 8000 --bind 127.0.0.1
 
 wsass:
 	sass --watch sass:static/css --style compressed
 
-celery:
-	cd watcher;DJANGO_SETTINGS_MODULE=watcher.settings python manage.py celery worker -Q screenshot,day,mail  -l info -B --scheduler djcelery.schedulers.DatabaseScheduler
-
-runserver:
-	cd watcher;python manage.py runserver
-
-flower:
-	cd watcher;DJANGO_SETTINGS_MODULE=watcher.settings celery -A watcher.tasks flower --port=5556
 sync:
 	uglifyjs --compress --mangle -- $(OUTPUTDIR)/js/local.js > $(OUTPUTDIR)/js/submit-your-salary.js
 	sed -i'' -e 's/local.js/submit-your-salary.js/' $(OUTPUTDIR)/testing.html
