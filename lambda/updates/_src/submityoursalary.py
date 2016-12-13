@@ -101,8 +101,7 @@ def handler(event, context):
         req_fields['source_ip'] = "1.1.1.1"
 
     try:
-        pass
-        # raise_on_rate_limit(req_fields['source_ip'], ret_body['action'])
+        raise_on_rate_limit(req_fields['source_ip'], ret_body['action'])
     except ValidationError as e:
         return default_resp(e)
 

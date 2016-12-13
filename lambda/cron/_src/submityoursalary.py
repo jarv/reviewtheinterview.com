@@ -12,6 +12,7 @@ LOG.setLevel(logging.WARN)
 
 PENDING_THRESHOLD = Key('approve').lt(2)
 APPROVE_THRESHOLD = Key('approve').gte(2)
+# Anything greater than this will be rejected
 REJECT_THRESHOLD = Key('reject').lt(2)
 
 
@@ -30,7 +31,7 @@ def delete_item(key_id):
 
 
 def get_items(p):
-    return sorted([{k: value_convert(d[k]) for k in list(EXTRA_RETURN_FIELDS) + list(SUBMIT_FIELDS)} for d in p['Items']], key=lambda d: d['create_time'], reverse=True)
+    return sorted([{k: value_convert(d[k]) for k in list(EXTRA_RETURN_FIELDS) + list(SUBMIT_FIELDS)} for d in p['Items']], key=lambda d: d['create_time'], reverse=True)[0:200]
 
 
 def handler(event, context):
